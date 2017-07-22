@@ -1,0 +1,6 @@
+.idea
+*.vcs
+*.iml
+log
+*.log
+vendor/*/

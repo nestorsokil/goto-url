@@ -1,0 +1,6 @@
+{
+  "log_dir" : "log/",
+  "port" : ":8080",
+  "mongo_url" : "localhost:27017",
+  "database" : "URLS"
+}
