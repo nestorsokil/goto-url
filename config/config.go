@@ -22,8 +22,12 @@ type Config struct {
 var Settings Config = loadConfig()
 
 func loadConfig() Config {
+	confPath := os.Getenv("GO_TO_URL_CONFIG")
+	if confPath == "" {
+		confPath = "config/conf.json"
+	}
 	var conf Config
-	file, err := os.Open("config/conf.json")
+	file, err := os.Open(confPath)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
