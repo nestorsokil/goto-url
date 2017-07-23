@@ -2,5 +2,10 @@
   "log_dir" : "log/",
   "port" : ":8080",
   "mongo_url" : "localhost:27017",
-  "database" : "URLS"
+  "database" : "URLS",
+  "application_url" : "http://localhost:8080",
+  "dev_mode" : true,
+  "key_length" : 5,
+  "expiration_time_hours" : 72,
+  "clear_time_minutes" : 5
 }

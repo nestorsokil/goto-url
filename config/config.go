@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"os"
@@ -7,17 +7,22 @@ import (
 	"path/filepath"
 )
 
-type configuration struct {
+type Config struct {
 	LogDir string `json:"log_dir"`
 	Port string `json:"port"`
 	MongoUrl string `json:"mongo_url"`
 	Database string `json:"database"`
+	KeyLength int `json:"key_length"`
+	DevMode bool `json:"dev_mode"`
+	ApplicationUrl string `json:"application_url"`
+	ExpirationTimeHours int `json:"expiration_time_hours"`
+	ClearTimeMinutes int `json:"clear_time_minutes"`
 }
 
-var conf configuration = loadConfig()
+var Settings Config = loadConfig()
 
-func loadConfig() configuration {
-	var conf configuration
+func loadConfig() Config {
+	var conf Config
 	file, err := os.Open("config/conf.json")
 	if err != nil {
 		log.Fatalf("Error: %v", err)
@@ -30,8 +35,8 @@ func loadConfig() configuration {
 	return conf
 }
 
-func setupGlobalLog() {
-	logDir := filepath.Dir(conf.LogDir)
+func GetGlobalLogFile() (*os.File) {
+	logDir := filepath.Dir(Settings.LogDir)
 	if logDir != "" {
 		err := os.MkdirAll(logDir, os.ModePerm)
 		if err != nil {
@@ -39,17 +44,18 @@ func setupGlobalLog() {
 		}
 	}
 	logFile, err := os.OpenFile(
-		conf.LogDir + string(os.PathSeparator) + "goto.log", os.O_CREATE, 0666)
+		Settings.LogDir + string(os.PathSeparator)+
+			"goto.log", os.O_CREATE, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer logFile.Close()
 	log.SetOutput(logFile)
+	return logFile
 }
 
-func getRequestLogFile() (*os.File){
+func GetRequestLogFile() (*os.File){
 	logFile, err := os.OpenFile(
-		conf.LogDir + string(os.PathSeparator) +
+		Settings.LogDir + string(os.PathSeparator) +
 			"request.log", os.O_CREATE, 0666)
 	if err != nil {
 		log.Fatal(err)
