@@ -10,7 +10,10 @@ import (
 type Config struct {
 	LogDir string `json:"log_dir"`
 	Port string `json:"port"`
-	MongoUrl string `json:"mongo_url"`
+	EnableTLS bool `json:"enable_tls"`
+	MongoUrls []string `json:"mongo_urls"`
+	MongoUser string `json:"mongo_user"`
+	MongoPassword string `json:"mongo_password"`
 	Database string `json:"database"`
 	KeyLength int `json:"key_length"`
 	DevMode bool `json:"dev_mode"`
