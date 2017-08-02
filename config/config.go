@@ -22,9 +22,7 @@ type Config struct {
 	ClearTimeMinutes int `json:"clear_time_minutes"`
 }
 
-var Settings Config = loadConfig()
-
-func loadConfig() Config {
+func LoadConfig() Config {
 	confPath := os.Getenv("GO_TO_URL_CONFIG")
 	if confPath == "" {
 		confPath = "config/conf.json"
@@ -34,6 +32,7 @@ func loadConfig() Config {
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
+	defer file.Close()
 
 	err = json.NewDecoder(file).Decode(&conf)
 	if err != nil {
@@ -42,27 +41,24 @@ func loadConfig() Config {
 	return conf
 }
 
-func GetGlobalLogFile() (*os.File) {
-	logDir := filepath.Dir(Settings.LogDir)
+func (conf *Config) GetGlobalLogFile() (*os.File) {
+	logDir := filepath.Dir(conf.LogDir)
 	if logDir != "" {
 		err := os.MkdirAll(logDir, os.ModePerm)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	logFile, err := os.OpenFile(
-		Settings.LogDir + string(os.PathSeparator)+
+	logFile, err := os.OpenFile(conf.LogDir + string(os.PathSeparator)+
 			"goto.log", os.O_CREATE, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.SetOutput(logFile)
 	return logFile
 }
 
-func GetRequestLogFile() (*os.File){
-	logFile, err := os.OpenFile(
-		Settings.LogDir + string(os.PathSeparator) +
+func (conf *Config) GetRequestLogFile() (*os.File){
+	logFile, err := os.OpenFile(conf.LogDir + string(os.PathSeparator) +
 			"request.log", os.O_CREATE, 0666)
 	if err != nil {
 		log.Fatal(err)

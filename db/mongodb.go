@@ -62,15 +62,15 @@ func (mongo *MongoDataSource) DeleteAllAfter(time uint64) (removed int, err erro
 	return info.Removed, nil
 }
 
-func NewMongoSession() *mgo.Session {
+func NewMongoSession(config *config.Config) *mgo.Session {
 	var session *mgo.Session
 	var err error
-	if config.Settings.EnableTLS {
+	if config.EnableTLS {
 		tlsConfig := &tls.Config{}
 		dialInfo := &mgo.DialInfo{
-			Addrs: config.Settings.MongoUrls,
-			Username: config.Settings.MongoUser,
-			Password: config.Settings.MongoPassword,
+			Addrs: config.MongoUrls,
+			Username: config.MongoUser,
+			Password: config.MongoPassword,
 		}
 		dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
 			conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
@@ -81,7 +81,7 @@ func NewMongoSession() *mgo.Session {
 			log.Fatal("[FATAL] ", err)
 		}
 	} else {
-		session, err = mgo.Dial(config.Settings.MongoUrls[0])
+		session, err = mgo.Dial(config.MongoUrls[0])
 		if err != nil {
 			log.Fatal("[FATAL] ", err)
 		}

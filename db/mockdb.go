@@ -37,3 +37,7 @@ func (ds *MockDataSource) DeleteAllAfter(time uint64) (removed int, err error) {
 	}
 	return count, nil
 }
+
+func NewMockDS() *MockDataSource {
+	return &MockDataSource{make(map[string]*Record)}
+}

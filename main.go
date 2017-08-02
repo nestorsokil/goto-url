@@ -14,20 +14,23 @@ import (
 )
 
 var srv service.Service
+var conf config.Config
 
 func main() {
-	globalLog := config.GetGlobalLogFile()
-	defer globalLog.Close()
+	conf = config.LoadConfig()
 
+	globalLog := conf.GetGlobalLogFile()
+	defer globalLog.Close()
 	log.SetOutput(globalLog)
-	requestLog := config.GetRequestLogFile()
+
+	requestLog := conf.GetRequestLogFile()
 	defer requestLog.Close()
 
-	session := db.NewMongoSession()
+	session := db.NewMongoSession(&conf)
 	defer session.Close()
 
-	ds := db.NewMongoDS(session, config.Settings.Database)
-	srv = service.New(ds)
+	ds := db.NewMongoDS(session, conf.Database)
+	srv = service.New(ds, &conf)
 
 	router := mux.NewRouter()
 	router.Handle("/short", http.HandlerFunc(shorten)).Methods("GET")
@@ -37,9 +40,9 @@ func main() {
 
 	go srv.ClearRecordsAsync()
 
-	log.Printf("[INFO] Starting server on %v.\n", config.Settings.Port)
-	fmt.Printf("[INFO] Starting server on %v.\n", config.Settings.Port)
-	http.ListenAndServe(config.Settings.Port, withLog)
+	log.Printf("[INFO] Starting server on %v.\n", conf.Port)
+	fmt.Printf("[INFO] Starting server on %v.\n", conf.Port)
+	http.ListenAndServe(conf.Port, withLog)
 }
 
 func shorten(response http.ResponseWriter, request *http.Request) {
@@ -50,8 +53,8 @@ func shorten(response http.ResponseWriter, request *http.Request) {
 	}
 
 	var base string
-	if config.Settings.DevMode == true {
-		base = config.Settings.ApplicationUrl
+	if conf.DevMode == true {
+		base = conf.ApplicationUrl
 	} else {
 		base = request.URL.Host
 	}

@@ -18,10 +18,11 @@ const (
 
 type Service struct {
 	dataSource db.DataSource
+	conf *config.Config
 }
 
-func New(dataSource db.DataSource) Service {
-	return Service{dataSource}
+func New(dataSource db.DataSource, conf *config.Config) Service {
+	return Service{dataSource, conf}
 }
 
 func (s *Service) GetRecord(url string) (*db.Record, error) {
@@ -40,7 +41,7 @@ func (s *Service) GetRecord(url string) (*db.Record, error) {
 		}
 		exists = e
 	}
-	expiresIn := time.Duration(config.Settings.ExpirationTimeHours) * time.Hour
+	expiresIn := time.Duration(s.conf.ExpirationTimeHours) * time.Hour
 	expiration := uint64(time.Now().Add(expiresIn).Unix())
 	rec := db.Record{Key:key, URL:url, Expiration:expiration}
 	err := s.dataSource.Save(rec)
@@ -51,7 +52,7 @@ func (s *Service) GetRecord(url string) (*db.Record, error) {
 }
 
 func (s *Service) randKey() string {
-	n := config.Settings.KeyLength
+	n := s.conf.KeyLength
 	b := make([]byte, n)
 	for i, cache, remain := n - 1, src.Int63(), letterIdxMax; i >= 0; {
 		if remain == 0 {
@@ -69,7 +70,7 @@ func (s *Service) randKey() string {
 }
 
 func (s *Service) ClearRecordsAsync() {
-	minutes := config.Settings.ClearTimeMinutes
+	minutes := s.conf.ClearTimeMinutes
 	waitTime := time.Duration(minutes) * time.Minute
 	for {
 		time.Sleep(waitTime)
