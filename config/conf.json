@@ -2,15 +2,14 @@
   "log_dir" : "log/",
   "port" : ":8080",
 
-  "enable_tls" : false,
+  "enable_tls" : true,
   "mongo_urls" :  [
-    "localhost:27017",
     "cluster0-shard-00-00-tjbip.mongodb.net:27017",
     "cluster0-shard-00-01-tjbip.mongodb.net:27017",
     "cluster0-shard-00-02-tjbip.mongodb.net:27017"
   ],
   "mongo_user" : "nsokil",
-  "mongo_password" : "",
+  "mongo_password" : "W17qTPaRlA0daghl",
   "database" : "URLS",
 
   "dev_mode" : true,

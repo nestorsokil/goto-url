@@ -13,6 +13,8 @@ import (
 	"github.com/nestorsokil/goto-url/service"
 )
 
+var srv service.Service
+
 func main() {
 	globalLog := config.GetGlobalLogFile()
 	defer globalLog.Close()
@@ -21,8 +23,11 @@ func main() {
 	requestLog := config.GetRequestLogFile()
 	defer requestLog.Close()
 
-	session := db.SetupConnection()
+	session := db.NewMongoSession()
 	defer session.Close()
+
+	ds := db.NewMongoDS(session, config.Settings.Database)
+	srv = service.New(ds)
 
 	router := mux.NewRouter()
 	router.Handle("/short", http.HandlerFunc(shorten)).Methods("GET")
@@ -30,7 +35,7 @@ func main() {
 
 	withLog := handlers.LoggingHandler(requestLog, router)
 
-	go service.ClearRecordsAsync()
+	go srv.ClearRecordsAsync()
 
 	log.Printf("[INFO] Starting server on %v.\n", config.Settings.Port)
 	fmt.Printf("[INFO] Starting server on %v.\n", config.Settings.Port)
@@ -51,7 +56,7 @@ func shorten(response http.ResponseWriter, request *http.Request) {
 		base = request.URL.Host
 	}
 
-	record, err := service.GetRecord(url)
+	record, err := srv.GetRecord(url)
 	if err != nil {
 		log.Println(err)
 		respond(response, http.StatusInternalServerError, "Could not shorten URL.")
@@ -69,7 +74,7 @@ func redirect(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	record := db.Find(key)
+	record := srv.FindByKey(key)
 	if record == nil {
 		respond(response, http.StatusNotFound, "URL not found.")
 		return

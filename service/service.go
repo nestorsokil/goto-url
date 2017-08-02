@@ -16,8 +16,16 @@ const (
 	letterIdxMax  = 63 / letterIdxBits
 )
 
-func GetRecord(url string) (*db.Record, error) {
-	record := db.FindShort(url)
+type Service struct {
+	dataSource db.DataSource
+}
+
+func New(dataSource db.DataSource) Service {
+	return Service{dataSource}
+}
+
+func (s *Service) GetRecord(url string) (*db.Record, error) {
+	record := s.dataSource.FindShort(url)
 	if record != nil {
 		return record, nil
 	}
@@ -25,8 +33,8 @@ func GetRecord(url string) (*db.Record, error) {
 	var key string
 	exists := true
 	for exists {
-		key = randKey()
-		e, err := db.ExistsKey(key)
+		key = s.randKey()
+		e, err := s.dataSource.ExistsKey(key)
 		if err != nil {
 			return nil, err
 		}
@@ -35,14 +43,14 @@ func GetRecord(url string) (*db.Record, error) {
 	expiresIn := time.Duration(config.Settings.ExpirationTimeHours) * time.Hour
 	expiration := uint64(time.Now().Add(expiresIn).Unix())
 	rec := db.Record{Key:key, URL:url, Expiration:expiration}
-	err := db.Save(rec)
+	err := s.dataSource.Save(rec)
 	if err != nil {
 		return nil, err
 	}
 	return &rec, nil
 }
 
-func randKey() string {
+func (s *Service) randKey() string {
 	n := config.Settings.KeyLength
 	b := make([]byte, n)
 	for i, cache, remain := n - 1, src.Int63(), letterIdxMax; i >= 0; {
@@ -60,16 +68,20 @@ func randKey() string {
 	return string(b)
 }
 
-func ClearRecordsAsync() {
+func (s *Service) ClearRecordsAsync() {
 	minutes := config.Settings.ClearTimeMinutes
 	waitTime := time.Duration(minutes) * time.Minute
 	for {
 		time.Sleep(waitTime)
 		now := uint64(time.Now().Unix())
-		removed, err := db.DeleteAllAfter(now)
+		removed, err := s.dataSource.DeleteAllAfter(now)
 		if err != nil {
 			log.Println("[ERROR]", err)
 		}
 		log.Println("[INFO] Expired records removed. Count:", removed)
 	}
+}
+
+func (s *Service) FindByKey(key string) *db.Record {
+	return s.dataSource.Find(key)
 }
