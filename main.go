@@ -8,16 +8,16 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/nestorsokil/goto-url/config"
+	"github.com/nestorsokil/goto-url/util"
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/service"
 )
 
-var srv service.Service
-var conf config.Config
+var urlService service.UrlService
+var conf util.Configuration
 
 func main() {
-	conf = config.LoadConfig()
+	conf = util.LoadConfig()
 
 	globalLog := conf.GetGlobalLogFile()
 	defer globalLog.Close()
@@ -29,16 +29,17 @@ func main() {
 	session := db.NewMongoSession(&conf)
 	defer session.Close()
 
-	ds := db.NewMongoDS(session, conf.Database)
-	srv = service.New(ds, &conf)
+	stop := make(chan struct{})
+	defer close(stop)
+
+	urlService = service.New(
+		db.NewMongoDS(session, conf.Database), &conf)
+	go urlService.ClearRecordsAsync(stop)
 
 	router := mux.NewRouter()
 	router.Handle("/short", http.HandlerFunc(shorten)).Methods("GET")
 	router.Handle("/{key}", http.HandlerFunc(redirect)).Methods("GET")
-
 	withLog := handlers.LoggingHandler(requestLog, router)
-
-	go srv.ClearRecordsAsync()
 
 	log.Printf("[INFO] Starting server on %v.\n", conf.Port)
 	fmt.Printf("[INFO] Starting server on %v.\n", conf.Port)
@@ -51,15 +52,13 @@ func shorten(response http.ResponseWriter, request *http.Request) {
 		respond(response, http.StatusBadRequest, "No url provided.")
 		return
 	}
-
 	var base string
 	if conf.DevMode == true {
 		base = conf.ApplicationUrl
 	} else {
 		base = request.URL.Host
 	}
-
-	record, err := srv.GetRecord(url)
+	record, err := urlService.GetRecord(url)
 	if err != nil {
 		log.Println(err)
 		respond(response, http.StatusInternalServerError, "Could not shorten URL.")
@@ -76,13 +75,11 @@ func redirect(response http.ResponseWriter, request *http.Request) {
 		respond(response, http.StatusBadRequest, "No key provided.")
 		return
 	}
-
-	record := srv.FindByKey(key)
+	record := urlService.FindByKey(key)
 	if record == nil {
 		respond(response, http.StatusNotFound, "URL not found.")
 		return
 	}
-
 	http.Redirect(response, request, record.URL, http.StatusMovedPermanently)
 }
 

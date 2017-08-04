@@ -27,7 +27,7 @@ func (ds *MockDataSource) ExistsKey(key string) (bool, error) {
 	return exists, nil
 }
 
-func (ds *MockDataSource) DeleteAllAfter(time uint64) (removed int, err error) {
+func (ds *MockDataSource) DeleteAllAfter(time int64) (removed int, err error) {
 	count := 0
 	for key, record := range ds.records {
 		if record.Expiration < time {

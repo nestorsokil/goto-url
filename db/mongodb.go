@@ -7,7 +7,7 @@ import (
 	"net"
 	"log"
 
-	"github.com/nestorsokil/goto-url/config"
+	"github.com/nestorsokil/goto-url/util"
 )
 
 type MongoDataSource struct {
@@ -53,7 +53,7 @@ func (mongo *MongoDataSource) ExistsKey(key string) (bool, error) {
 	return count > 0, nil
 }
 
-func (mongo *MongoDataSource) DeleteAllAfter(time uint64) (removed int, err error) {
+func (mongo *MongoDataSource) DeleteAllAfter(time int64) (removed int, err error) {
 	info, err := mongo.query().C("records").RemoveAll(
 		bson.M{"expiration": bson.M{"$gt": time}})
 	if err != nil {
@@ -62,7 +62,7 @@ func (mongo *MongoDataSource) DeleteAllAfter(time uint64) (removed int, err erro
 	return info.Removed, nil
 }
 
-func NewMongoSession(config *config.Config) *mgo.Session {
+func NewMongoSession(config *util.Configuration) *mgo.Session {
 	var session *mgo.Session
 	var err error
 	if config.EnableTLS {

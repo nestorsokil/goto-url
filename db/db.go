@@ -5,12 +5,12 @@ type DataSource interface {
 	FindShort(url string) *Record
 	Save(newRecord Record) (error)
 	ExistsKey(key string) (bool, error)
-	DeleteAllAfter(time uint64) (removed int, err error)
+	DeleteAllAfter(time int64) (removed int, err error)
 }
 
 type Record struct {
 	Key string
 	URL string
-	Expiration uint64
+	Expiration int64
 }
 

@@ -17,5 +17,5 @@
 
   "key_length" : 5,
   "expiration_time_hours" : 72,
-  "clear_time_minutes" : 5
+  "clear_time_seconds" : 5
 }

@@ -3,29 +3,20 @@ package service
 import (
 	"time"
 	"log"
-	"math/rand"
 	"github.com/nestorsokil/goto-url/db"
-	"github.com/nestorsokil/goto-url/config"
+	"github.com/nestorsokil/goto-url/util"
 )
 
-var src = rand.NewSource(time.Now().UnixNano())
-const (
-	letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-	letterIdxBits = 6
-	letterIdxMask = 1 << letterIdxBits - 1
-	letterIdxMax  = 63 / letterIdxBits
-)
-
-type Service struct {
+type UrlService struct {
 	dataSource db.DataSource
-	conf *config.Config
+	conf *util.Configuration
 }
 
-func New(dataSource db.DataSource, conf *config.Config) Service {
-	return Service{dataSource, conf}
+func New(dataSource db.DataSource, conf *util.Configuration) UrlService {
+	return UrlService{dataSource, conf}
 }
 
-func (s *Service) GetRecord(url string) (*db.Record, error) {
+func (s *UrlService) GetRecord(url string) (*db.Record, error) {
 	record := s.dataSource.FindShort(url)
 	if record != nil {
 		return record, nil
@@ -34,15 +25,16 @@ func (s *Service) GetRecord(url string) (*db.Record, error) {
 	var key string
 	exists := true
 	for exists {
-		key = s.randKey()
+		key = randKey(s.conf.KeyLength)
 		e, err := s.dataSource.ExistsKey(key)
 		if err != nil {
 			return nil, err
 		}
 		exists = e
 	}
-	expiresIn := time.Duration(s.conf.ExpirationTimeHours) * time.Hour
-	expiration := uint64(time.Now().Add(expiresIn).Unix())
+	now := time.Now().UnixNano()
+	expiresIn := s.conf.ExpirationTimeHours * time.Hour.Nanoseconds()
+	expiration := now + expiresIn
 	rec := db.Record{Key:key, URL:url, Expiration:expiration}
 	err := s.dataSource.Save(rec)
 	if err != nil {
@@ -51,38 +43,24 @@ func (s *Service) GetRecord(url string) (*db.Record, error) {
 	return &rec, nil
 }
 
-func (s *Service) randKey() string {
-	n := s.conf.KeyLength
-	b := make([]byte, n)
-	for i, cache, remain := n - 1, src.Int63(), letterIdxMax; i >= 0; {
-		if remain == 0 {
-			cache, remain = src.Int63(), letterIdxMax
-		}
-		if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-			b[i] = letterBytes[idx]
-			i--
-		}
-		cache >>= letterIdxBits
-		remain--
-	}
-
-	return string(b)
-}
-
-func (s *Service) ClearRecordsAsync() {
-	minutes := s.conf.ClearTimeMinutes
-	waitTime := time.Duration(minutes) * time.Minute
+func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
+	waitTime := time.Duration(s.conf.ClearTimeSeconds * time.Second.Nanoseconds())
 	for {
-		time.Sleep(waitTime)
-		now := uint64(time.Now().Unix())
-		removed, err := s.dataSource.DeleteAllAfter(now)
-		if err != nil {
-			log.Println("[ERROR]", err)
+		select {
+		case <-stopSignal:
+			return
+		default:
+			time.Sleep(waitTime)
+			now := time.Now().UnixNano()
+			removed, err := s.dataSource.DeleteAllAfter(now)
+			if err != nil {
+				log.Println("[ERROR]", err)
+			}
+			log.Println("[INFO] Expired records removed. Count:", removed)
 		}
-		log.Println("[INFO] Expired records removed. Count:", removed)
 	}
 }
 
-func (s *Service) FindByKey(key string) *db.Record {
+func (s *UrlService) FindByKey(key string) *db.Record {
 	return s.dataSource.Find(key)
 }
