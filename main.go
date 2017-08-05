@@ -11,7 +11,6 @@ import (
 	"github.com/nestorsokil/goto-url/util"
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/service"
-	"errors"
 )
 
 var urlService service.UrlService
