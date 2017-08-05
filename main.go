@@ -11,6 +11,7 @@ import (
 	"github.com/nestorsokil/goto-url/util"
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/service"
+	"errors"
 )
 
 var urlService service.UrlService
@@ -47,26 +48,21 @@ func main() {
 }
 
 func shorten(response http.ResponseWriter, request *http.Request) {
-	url := request.URL.Query().Get("url")
-	if url == "" {
-		respond(response, http.StatusBadRequest, "No url provided.")
-		return
-	}
-	var base string
-	if conf.DevMode == true {
-		base = conf.ApplicationUrl
-	} else {
-		base = request.URL.Host
-	}
-	record, err := urlService.GetRecord(url)
+	queryParams := request.URL.Query()
+	record, err := urlService.GetRecord(
+		urlService.RequestBuilder().
+			ForUrl(queryParams.Get("url")).
+			WithCustomKey(queryParams.Get("customKey")).
+			WithCustomExpirationTime(queryParams.Get("customExpire")).
+			Build())
 	if err != nil {
 		log.Println(err)
-		respond(response, http.StatusInternalServerError, "Could not shorten URL.")
+		respond(response, http.StatusInternalServerError,
+			fmt.Sprintf("Could not shorten URL. Error: %v", err))
 		return
 	}
-	key := record.Key
-	final := base + "/" + key
-	io.WriteString(response, final)
+	responseUrl := urlService.ConstructUrl(request.URL.Host, record.Key)
+	io.WriteString(response, responseUrl)
 }
 
 func redirect(response http.ResponseWriter, request *http.Request) {

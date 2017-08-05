@@ -1,5 +1,7 @@
 package db
 
+import "fmt"
+
 type MockDataSource struct {
 	records map[string] *Record
 }
@@ -31,6 +33,7 @@ func (ds *MockDataSource) DeleteAllAfter(time int64) (removed int, err error) {
 	count := 0
 	for key, record := range ds.records {
 		if record.Expiration < time {
+			fmt.Println(record)
 			delete(ds.records, key)
 			count++
 		}
