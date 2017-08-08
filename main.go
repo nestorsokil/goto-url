@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
-	"net/http"
-	"log"
-	"github.com/gorilla/handlers"
 	"fmt"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"io"
+	"log"
+	"net/http"
 
-	"github.com/nestorsokil/goto-url/util"
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/service"
+	"github.com/nestorsokil/goto-url/util"
 )
 
 var urlService service.UrlService

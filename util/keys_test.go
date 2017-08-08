@@ -19,4 +19,3 @@ func TestRandKey(t *testing.T) {
 		t.Errorf("Expected size: %d, actual: %d", 10, len(key3))
 	}
 }
-

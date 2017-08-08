@@ -1,15 +1,15 @@
 package service
 
 import (
-	"testing"
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/util"
-	"time"
 	"math"
+	"testing"
+	"time"
 )
 
 func TestUrlService_GetRecord(t *testing.T) {
-	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 1, }
+	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 1}
 	subject := New(db.NewMockDS(), conf)
 
 	testUrl := "http://url.com"
@@ -32,7 +32,7 @@ func TestUrlService_GetRecord(t *testing.T) {
 }
 
 func TestUrlService_GetRecord_WithCustomKey(t *testing.T) {
-	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 1, }
+	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 1}
 	subject := New(db.NewMockDS(), conf)
 	testUrl := "http://url.com"
 	customKey := "bla/bla/bla"
@@ -60,7 +60,7 @@ func TestUrlService_GetRecord_WithCustomKey(t *testing.T) {
 }
 
 func TestService_FindByKey(t *testing.T) {
-	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 1, }
+	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 1}
 	subject := New(db.NewMockDS(), conf)
 
 	testUrl := "http://url.com"
@@ -79,7 +79,7 @@ func TestService_FindByKey(t *testing.T) {
 	}
 
 	now := time.Now().UnixNano()
-	shouldExpireInApprox := now + conf.ExpirationTimeHours * time.Hour.Nanoseconds()
+	shouldExpireInApprox := now + conf.ExpirationTimeHours*time.Hour.Nanoseconds()
 	countErr := 1 * time.Second.Nanoseconds()
 	actualErr := int64(math.Abs(float64(record.Expiration - shouldExpireInApprox)))
 	if actualErr > countErr {
@@ -102,7 +102,7 @@ func TestUrlService_ClearRecordsAsync(t *testing.T) {
 
 	done := make(chan struct{})
 	go subject.ClearRecordsAsync(done)
-	time.Sleep(time.Duration((conf.ClearTimeSeconds+1) * time.Second.Nanoseconds()))
+	time.Sleep(time.Duration((conf.ClearTimeSeconds + 1) * time.Second.Nanoseconds()))
 	done <- struct{}{}
 
 	shouldBeNil := subject.FindByKey(record.Key)

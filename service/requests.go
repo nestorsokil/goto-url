@@ -6,9 +6,9 @@ import (
 )
 
 type Request struct {
-	url 		string
-	expire	 	int64
-	customKey 	string
+	url       string
+	expire    int64
+	customKey string
 }
 
 type RequestBuilder struct {
@@ -16,8 +16,8 @@ type RequestBuilder struct {
 }
 
 func builder(conf *util.Configuration) *RequestBuilder {
-	req := Request{expire:conf.ExpirationTimeHours}
-	return &RequestBuilder{	request: req }
+	req := Request{expire: conf.ExpirationTimeHours}
+	return &RequestBuilder{request: req}
 }
 
 func (rb *RequestBuilder) ForUrl(url string) *RequestBuilder {

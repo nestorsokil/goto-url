@@ -3,7 +3,7 @@ package db
 import "fmt"
 
 type MockDataSource struct {
-	records map[string] *Record
+	records map[string]*Record
 }
 
 func (ds *MockDataSource) Find(key string) *Record {
@@ -19,7 +19,7 @@ func (ds *MockDataSource) FindShort(url string) *Record {
 	return nil
 }
 
-func (ds *MockDataSource) Save(newRecord Record) (error) {
+func (ds *MockDataSource) Save(newRecord Record) error {
 	ds.records[newRecord.Key] = &newRecord
 	return nil
 }

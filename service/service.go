@@ -1,17 +1,17 @@
 package service
 
 import (
-	"time"
-	"log"
-	"github.com/nestorsokil/goto-url/db"
-	"github.com/nestorsokil/goto-url/util"
 	"errors"
 	"fmt"
+	"github.com/nestorsokil/goto-url/db"
+	"github.com/nestorsokil/goto-url/util"
+	"log"
+	"time"
 )
 
 type UrlService struct {
 	dataSource db.DataSource
-	conf *util.Configuration
+	conf       *util.Configuration
 }
 
 func New(dataSource db.DataSource, conf *util.Configuration) UrlService {
@@ -72,8 +72,8 @@ func (s *UrlService) createWithRandKey(url string, expireIn int64) (*db.Record, 
 
 func (s *UrlService) createRecord(key, url string, expireIn int64) (*db.Record, error) {
 	now := time.Now().UnixNano()
-	expiration := now + expireIn * time.Hour.Nanoseconds()
-	rec := db.Record{Key:key, URL:url, Expiration:expiration}
+	expiration := now + expireIn*time.Hour.Nanoseconds()
+	rec := db.Record{Key: key, URL: url, Expiration: expiration}
 	err := s.dataSource.Save(rec)
 	if err != nil {
 		return nil, err

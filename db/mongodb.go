@@ -1,27 +1,27 @@
 package db
 
 import (
-	"gopkg.in/mgo.v2/bson"
-	"gopkg.in/mgo.v2"
 	"crypto/tls"
-	"net"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"log"
+	"net"
 
 	"github.com/nestorsokil/goto-url/util"
 )
 
 type MongoDataSource struct {
-	session *mgo.Session
+	session  *mgo.Session
 	database string
 }
 
-func(mongo *MongoDataSource) query() *mgo.Database {
+func (mongo *MongoDataSource) query() *mgo.Database {
 	return mongo.session.DB(mongo.database)
 }
 
 func (mongo *MongoDataSource) Find(key string) *Record {
 	var result Record
-	err := mongo.query().C("records").Find(bson.M{"key" : key}).One(&result)
+	err := mongo.query().C("records").Find(bson.M{"key": key}).One(&result)
 	if err != nil {
 		return nil
 	}
@@ -30,14 +30,14 @@ func (mongo *MongoDataSource) Find(key string) *Record {
 
 func (mongo *MongoDataSource) FindShort(url string) *Record {
 	var result Record
-	err := mongo.query().C("records").Find(bson.M{"url" : url}).One(&result)
+	err := mongo.query().C("records").Find(bson.M{"url": url}).One(&result)
 	if err != nil {
 		return nil
 	}
 	return &result
 }
 
-func (mongo *MongoDataSource) Save(newRecord Record) (error) {
+func (mongo *MongoDataSource) Save(newRecord Record) error {
 	err := mongo.query().C("records").Insert(newRecord)
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func NewMongoSession(config *util.Configuration) *mgo.Session {
 	if config.EnableTLS {
 		tlsConfig := &tls.Config{}
 		dialInfo := &mgo.DialInfo{
-			Addrs: config.MongoUrls,
+			Addrs:    config.MongoUrls,
 			Username: config.MongoUser,
 			Password: config.MongoPassword,
 		}
