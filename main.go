@@ -32,11 +32,14 @@ func main() {
 	stop := make(chan struct{})
 	defer close(stop)
 
-	urlService = service.New(
-		db.NewMongoDS(session, conf.Database), &conf)
+	ds := db.NewMongoDS(session, conf.Database)
+	urlService = service.New(&ds, &conf)
 	go urlService.ClearRecordsAsync(stop)
 
+	fs := http.FileServer(http.Dir("static"))
 	router := mux.NewRouter()
+	router.PathPrefix("/home/").Handler(http.StripPrefix("/home/", fs))
+	router.Handle("/", http.HandlerFunc(redirectToIndex)).Methods("GET")
 	router.Handle("/short", http.HandlerFunc(shorten)).Methods("GET")
 	router.Handle("/{key}", http.HandlerFunc(redirect)).Methods("GET")
 	withLog := handlers.LoggingHandler(requestLog, router)
@@ -76,6 +79,10 @@ func redirect(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 	http.Redirect(response, request, record.URL, http.StatusMovedPermanently)
+}
+
+func redirectToIndex(response http.ResponseWriter, request *http.Request) {
+	http.Redirect(response, request, "home/", http.StatusMovedPermanently)
 }
 
 func respond(response http.ResponseWriter, status int, content string) {

@@ -33,7 +33,6 @@ func (ds *MockDataSource) DeleteAllAfter(time int64) (removed int, err error) {
 	count := 0
 	for key, record := range ds.records {
 		if record.Expiration < time {
-			fmt.Println(record)
 			delete(ds.records, key)
 			count++
 		}
@@ -41,6 +40,6 @@ func (ds *MockDataSource) DeleteAllAfter(time int64) (removed int, err error) {
 	return count, nil
 }
 
-func NewMockDS() *MockDataSource {
-	return &MockDataSource{make(map[string]*Record)}
+func NewMockDS() MockDataSource {
+	return MockDataSource{make(map[string]*Record)}
 }

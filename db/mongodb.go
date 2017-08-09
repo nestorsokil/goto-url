@@ -89,6 +89,6 @@ func NewMongoSession(config *util.Configuration) *mgo.Session {
 	return session
 }
 
-func NewMongoDS(session *mgo.Session, database string) *MongoDataSource {
-	return &MongoDataSource{session, database}
+func NewMongoDS(session *mgo.Session, database string) MongoDataSource {
+	return MongoDataSource{session, database}
 }
