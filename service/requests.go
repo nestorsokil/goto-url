@@ -15,7 +15,7 @@ type RequestBuilder struct {
 	request Request
 }
 
-func builder(conf *util.Configuration) *RequestBuilder {
+func builder(conf *util.ApplicationConfig) *RequestBuilder {
 	req := Request{expire: conf.ExpirationTimeHours}
 	return &RequestBuilder{request: req}
 }

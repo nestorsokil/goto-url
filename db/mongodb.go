@@ -62,7 +62,16 @@ func (mongo *MongoDataSource) DeleteAllAfter(time int64) (removed int, err error
 	return info.Removed, nil
 }
 
-func NewMongoSession(config *util.Configuration) *mgo.Session {
+func (mongo *MongoDataSource) Shutdown() {
+	mongo.session.Close()
+}
+
+func NewMongoDS(config *util.MongoConfig) DataSource {
+	session := newMongoSession(config)
+	return &MongoDataSource{session, config.DatabaseName}
+}
+
+func newMongoSession(config *util.MongoConfig) *mgo.Session {
 	var session *mgo.Session
 	var err error
 	if config.EnableTLS {
@@ -87,8 +96,4 @@ func NewMongoSession(config *util.Configuration) *mgo.Session {
 		}
 	}
 	return session
-}
-
-func NewMongoDS(session *mgo.Session, database string) MongoDataSource {
-	return MongoDataSource{session, database}
 }

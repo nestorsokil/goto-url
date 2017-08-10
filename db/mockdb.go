@@ -1,7 +1,5 @@
 package db
 
-import "fmt"
-
 type MockDataSource struct {
 	records map[string]*Record
 }
@@ -40,6 +38,10 @@ func (ds *MockDataSource) DeleteAllAfter(time int64) (removed int, err error) {
 	return count, nil
 }
 
-func NewMockDS() MockDataSource {
-	return MockDataSource{make(map[string]*Record)}
+func (ds *MockDataSource) Shutdown() {
+	// skip
+}
+
+func NewMockDS() DataSource {
+	return &MockDataSource{make(map[string]*Record)}
 }

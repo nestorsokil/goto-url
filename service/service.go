@@ -11,10 +11,10 @@ import (
 
 type UrlService struct {
 	dataSource db.DataSource
-	conf       *util.Configuration
+	conf       *util.ApplicationConfig
 }
 
-func New(dataSource db.DataSource, conf *util.Configuration) UrlService {
+func New(dataSource db.DataSource, conf *util.ApplicationConfig) UrlService {
 	return UrlService{dataSource, conf}
 }
 

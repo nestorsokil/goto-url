@@ -14,7 +14,7 @@ import (
 )
 
 var urlService service.UrlService
-var conf util.Configuration
+var conf util.ApplicationConfig
 
 func main() {
 	conf = util.LoadConfig()
@@ -26,14 +26,13 @@ func main() {
 	requestLog := conf.GetRequestLogFile()
 	defer requestLog.Close()
 
-	session := db.NewMongoSession(&conf)
-	defer session.Close()
+	ds := db.CreateDataSource(&conf)
+	defer ds.Shutdown()
 
 	stop := make(chan struct{})
 	defer close(stop)
 
-	ds := db.NewMongoDS(session, conf.Database)
-	urlService = service.New(&ds, &conf)
+	urlService = service.New(ds, &conf)
 	go urlService.ClearRecordsAsync(stop)
 
 	fs := http.FileServer(http.Dir("static"))

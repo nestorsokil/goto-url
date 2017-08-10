@@ -9,7 +9,7 @@ import (
 )
 
 func TestUrlService_GetRecord(t *testing.T) {
-	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 1}
+	conf := &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 1}
 	subject := New(db.NewMockDS(), conf)
 
 	testUrl := "http://url.com"
@@ -32,7 +32,7 @@ func TestUrlService_GetRecord(t *testing.T) {
 }
 
 func TestUrlService_GetRecord_WithCustomKey(t *testing.T) {
-	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 1}
+	conf := &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 1}
 	subject := New(db.NewMockDS(), conf)
 	testUrl := "http://url.com"
 	customKey := "bla/bla/bla"
@@ -60,7 +60,7 @@ func TestUrlService_GetRecord_WithCustomKey(t *testing.T) {
 }
 
 func TestService_FindByKey(t *testing.T) {
-	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 1}
+	conf := &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 1}
 	subject := New(db.NewMockDS(), conf)
 
 	testUrl := "http://url.com"
@@ -89,7 +89,7 @@ func TestService_FindByKey(t *testing.T) {
 }
 
 func TestUrlService_ClearRecordsAsync(t *testing.T) {
-	conf := &util.Configuration{KeyLength: 5, ExpirationTimeHours: 0, ClearTimeSeconds: 1}
+	conf := &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 0, ClearTimeSeconds: 1}
 	subject := New(db.NewMockDS(), conf)
 
 	record, _ := subject.GetRecord(

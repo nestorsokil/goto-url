@@ -1,0 +1,11 @@
+{
+  "enable_tls" : true,
+  "mongo_urls" :  [
+    "cluster0-shard-00-00-tjbip.mongodb.net:27017",
+    "cluster0-shard-00-01-tjbip.mongodb.net:27017",
+    "cluster0-shard-00-02-tjbip.mongodb.net:27017"
+  ],
+  "mongo_user" : "nsokil",
+  "mongo_password" : "W17qTPaRlA0daghl",
+  "database_name" : "URLS"
+}

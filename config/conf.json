@@ -2,18 +2,10 @@
   "log_dir" : "log/",
   "port" : ":8080",
 
-  "enable_tls" : true,
-  "mongo_urls" :  [
-    "cluster0-shard-00-00-tjbip.mongodb.net:27017",
-    "cluster0-shard-00-01-tjbip.mongodb.net:27017",
-    "cluster0-shard-00-02-tjbip.mongodb.net:27017"
-  ],
-  "mongo_user" : "nsokil",
-  "mongo_password" : "W17qTPaRlA0daghl",
-  "database" : "URLS",
-
   "dev_mode" : true,
   "application_url" : "http://localhost:8080",
+
+  "database" : "mongo",
 
   "key_length" : 5,
   "expiration_time_hours" : 72,
