@@ -6,11 +6,13 @@ import (
 )
 
 type DataSource interface {
+	// TODO refactor to (record, err)
 	Find(key string) *Record
+	// TODO refactor to (record, err)
 	FindShort(url string) *Record
 	Save(newRecord Record) error
 	ExistsKey(key string) (bool, error)
-	DeleteAllAfter(time int64) (removed int, err error)
+	DeleteAllExpiredBefore(time int64) (removed int, err error)
 
 	Shutdown()
 }
@@ -29,6 +31,9 @@ func CreateDataSource(config *util.ApplicationConfig) DataSource {
 	case util.MONGO:
 		mongoConfig := util.LoadMongoConfig()
 		return NewMongoDS(&mongoConfig)
+	case util.REDIS:
+		redisConfig := util.LoadRedisConfig()
+		return NewRedisDs(&redisConfig)
 	default:
 		log.Fatalf("Unrecognized db option: %s", dsType)
 		return nil

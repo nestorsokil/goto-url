@@ -53,9 +53,9 @@ func (mongo *MongoDataSource) ExistsKey(key string) (bool, error) {
 	return count > 0, nil
 }
 
-func (mongo *MongoDataSource) DeleteAllAfter(time int64) (removed int, err error) {
+func (mongo *MongoDataSource) DeleteAllExpiredBefore(time int64) (removed int, err error) {
 	info, err := mongo.query().C("records").RemoveAll(
-		bson.M{"expiration": bson.M{"$gt": time}})
+		bson.M{"expiration": bson.M{"$lt": time}})
 	if err != nil {
 		return 0, err
 	}

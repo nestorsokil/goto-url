@@ -43,6 +43,9 @@ func main() {
 	router.Handle("/{key}", http.HandlerFunc(redirect)).Methods("GET")
 	withLog := handlers.LoggingHandler(requestLog, router)
 
+	staticFS := http.FileServer(http.Dir("static/"))
+	http.Handle("/static/", http.StripPrefix("/static/", staticFS))
+
 	log.Printf("[INFO] Starting server on %v.\n", conf.Port)
 	fmt.Printf("[INFO] Starting server on %v.\n", conf.Port)
 	http.ListenAndServe(conf.Port, withLog)

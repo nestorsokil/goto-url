@@ -5,7 +5,7 @@
   "dev_mode" : true,
   "application_url" : "http://localhost:8080",
 
-  "database" : "mongo",
+  "database" : "redis",
 
   "key_length" : 5,
   "expiration_time_hours" : 72,

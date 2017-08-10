@@ -10,6 +10,7 @@ import (
 const (
 	MONGO     = "mongo"
 	IN_MEMORY = "inMemory"
+	REDIS = "redis"
 )
 
 var configDirectory string
@@ -33,36 +34,45 @@ type MongoConfig struct {
 	EnableTLS     bool     `json:"enable_tls"`
 }
 
+type RedisConfig struct {
+	RedisUrl string `json:"redis_url"`
+}
+
 func LoadConfig() ApplicationConfig {
 	configDirectory = os.Getenv("GO_TO_URL_CONFIG")
 	if configDirectory == "" {
 		configDirectory = "config/"
 	}
 	var conf ApplicationConfig
-	file, err := os.Open(configDirectory + "conf.json")
-	if err != nil {
-		log.Fatalf("Error: %v", err)
-	}
-	defer file.Close()
-
-	err = json.NewDecoder(file).Decode(&conf)
-	if err != nil {
-		log.Fatalf("Error parsing config file: %v", err)
-	}
+	configPath := configDirectory + "conf.json"
+	parseConfig(configPath, &conf)
 	return conf
 }
 
 func LoadMongoConfig() MongoConfig {
 	var conf MongoConfig
-	file, err := os.Open(configDirectory + "mongo_conf.json")
+	configPath := configDirectory + "mongo_conf.json"
+	parseConfig(configPath, &conf)
+	return conf
+}
+
+func LoadRedisConfig() RedisConfig {
+	var conf RedisConfig
+	configPath := configDirectory + "redis_conf.json"
+	parseConfig(configPath, &conf)
+	return conf
+}
+
+func parseConfig(fromFile string, toStruct interface{}) {
+	file, err := os.Open(fromFile)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
-	err = json.NewDecoder(file).Decode(&conf)
+	defer file.Close()
+	err = json.NewDecoder(file).Decode(toStruct)
 	if err != nil {
 		log.Fatalf("Error parsing config file: %v", err)
 	}
-	return conf
 }
 
 func (conf *ApplicationConfig) GetGlobalLogFile() *os.File {

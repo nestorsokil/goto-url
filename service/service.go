@@ -76,6 +76,7 @@ func (s *UrlService) createRecord(key, url string, expireIn int64) (*db.Record, 
 	rec := db.Record{Key: key, URL: url, Expiration: expiration}
 	err := s.dataSource.Save(rec)
 	if err != nil {
+		fmt.Println(err.Error())
 		return nil, err
 	}
 	return &rec, nil
@@ -90,7 +91,7 @@ func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
 		default:
 			time.Sleep(waitTime)
 			now := time.Now().UnixNano()
-			removed, err := s.dataSource.DeleteAllAfter(now)
+			removed, err := s.dataSource.DeleteAllExpiredBefore(now)
 			if err != nil {
 				log.Println("[ERROR]", err)
 			}
