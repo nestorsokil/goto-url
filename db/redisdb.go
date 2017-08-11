@@ -20,41 +20,51 @@ func (rds *RedisDataSource) Find(key string) (*Record, error) {
 }
 
 func (rds *RedisDataSource) FindShort(url string) (*Record, error) {
-	hash, err := rds.client.Cmd("ZRANGEBYSCORE", "record.URL.index", url).Hash()
+	hash, err := rds.client.Cmd("HGETALL", "record.URL:"+url).Hash()
 	if err != nil {
 		return nil, err
 	}
-	return asRecord(hash), nil
+	return rds.Find(hash["key"])
 }
 
 func (rds *RedisDataSource) Save(newRecord *Record) error {
-	key, url, exp := newRecord.Key, newRecord.URL, newRecord.Expiration
-	reply := rds.client.Cmd("HMSET", "record:"+key, "key", key, "URL", url, "expiration", exp)
+	key, url, exp, mustExp := newRecord.Key, newRecord.URL,
+		newRecord.Expiration, newRecord.MustExpire
+	reply := rds.client.Cmd("HMSET", "record:"+key, "key", key, "URL", url, "expiration", exp, "mustExpire", mustExp)
 	if reply.Err != nil {
 		return reply.Err
 	}
-	reply = rds.client.Cmd("ZADD", "record.URL.index", url, key)
-	return nil
+	reply = rds.client.Cmd("HMSET", "record.URL:"+url, "key", key)
+	if reply.Err != nil {
+		return reply.Err
+	}
+	reply = rds.client.Cmd("ZADD", "record.time.index", exp, key)
+	return reply.Err
 }
 
 func (rds *RedisDataSource) ExistsKey(key string) (bool, error) {
-	return rds.client.Cmd("EXISTS", "records:"+key).Bool()
+	return rds.client.Cmd("EXISTS", "record:"+key).Bool()
 }
 
 func (rds *RedisDataSource) DeleteAllExpiredBefore(time int64) (removed int, err error) {
-	// looks like redis is not a great choice for this
-	replies := rds.client.Cmd("HGETALL", "record").Elems
+	replies := rds.client.Cmd("ZRANGEBYSCORE", "record.time.index", 0, time).Elems
 	removed = 0
 	for _, reply := range replies {
+		if reply == nil {
+			continue
+		}
 		hash, err := reply.Hash()
 		if err != nil {
 			continue
 		}
-		record := asRecord(hash)
-		if record.Expiration < time {
-			rds.client.Cmd("DEL", "record:"+record.Key)
-			removed++
+		record, err := rds.Find(hash["key"])
+		if err != nil {
+			continue
 		}
+		rds.client.Cmd("DEL", "record:"+record.Key)
+		rds.client.Cmd("DEL", "record.URL:"+record.URL)
+		rds.client.Cmd("ZREM", "record.time.index", record.Key)
+		removed++
 	}
 	return removed, nil
 }
