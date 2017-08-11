@@ -84,7 +84,7 @@ func (conf *ApplicationConfig) GetGlobalLogFile() *os.File {
 		}
 	}
 	logFile, err := os.OpenFile(conf.LogDir+string(os.PathSeparator)+
-		"goto.log", os.O_CREATE, 0777)
+		"server.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0777)
 	if err != nil {
 		log.Fatal(err)
 	}

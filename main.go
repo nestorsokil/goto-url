@@ -5,16 +5,18 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"io"
-	"log"
 	"net/http"
 
+	"github.com/nestorsokil/gl"
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/service"
 	"github.com/nestorsokil/goto-url/util"
+	"time"
 )
 
 var urlService service.UrlService
 var conf util.ApplicationConfig
+var logger gl.Logger
 
 func main() {
 	conf = util.LoadConfig()
@@ -22,19 +24,24 @@ func main() {
 	globalLog := conf.GetGlobalLogFile()
 	defer globalLog.Sync()
 	defer globalLog.Close()
-	log.SetOutput(globalLog)
-
 	requestLog := conf.GetRequestLogFile()
-	defer globalLog.Sync()
+	defer requestLog.Sync()
 	defer requestLog.Close()
 
-	ds := db.CreateDataSource(&conf)
+	ds, err := db.CreateDataSource(&conf)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
 	defer ds.Shutdown()
 
 	stop := make(chan struct{})
 	defer close(stop)
 
-	urlService = service.New(ds, &conf)
+	logger = gl.Simple().
+		WriteTo(globalLog).
+		WithLevel(gl.LEVEL_DEBUG).
+		Build()
+	urlService = service.New(ds, &conf, logger)
 	go urlService.ClearRecordsAsync(stop)
 
 	fs := http.FileServer(http.Dir("static"))
@@ -48,8 +55,12 @@ func main() {
 	staticFS := http.FileServer(http.Dir("static/"))
 	http.Handle("/static/", http.StripPrefix("/static/", staticFS))
 
-	log.Printf("[INFO] Starting server on %v.\n", conf.Port)
-	fmt.Printf("[INFO] Starting server on %v.\n", conf.Port)
+	for {
+		time.Sleep(1 * time.Second)
+		logger.Info("Running...")
+	}
+
+	logger.Info("Starting server on %v.", conf.Port)
 	http.ListenAndServe(conf.Port, withLog)
 }
 
@@ -62,7 +73,7 @@ func shorten(response http.ResponseWriter, request *http.Request) {
 			WithCustomExpirationTime(queryParams.Get("customExpire")).
 			Build())
 	if err != nil {
-		log.Println(err)
+		logger.Error(err.Error())
 		respond(response, http.StatusInternalServerError,
 			fmt.Sprintf("Could not shorten URL. Error: %v", err))
 		return

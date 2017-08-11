@@ -1,8 +1,9 @@
 package db
 
 import (
+	"errors"
+	"fmt"
 	"github.com/nestorsokil/goto-url/util"
-	"log"
 )
 
 type DataSource interface {
@@ -23,7 +24,7 @@ type Record struct {
 	MustExpire bool
 }
 
-func CreateDataSource(config *util.ApplicationConfig) DataSource {
+func CreateDataSource(config *util.ApplicationConfig) (DataSource, error) {
 	dsType := config.Database
 	switch dsType {
 	case util.IN_MEMORY:
@@ -35,7 +36,6 @@ func CreateDataSource(config *util.ApplicationConfig) DataSource {
 		redisConfig := util.LoadRedisConfig()
 		return NewRedisDs(&redisConfig)
 	default:
-		log.Fatalf("Unrecognized db option: %s", dsType)
-		return nil
+		return nil, errors.New(fmt.Sprintf("Unrecognized db option: %s", dsType))
 	}
 }

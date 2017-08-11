@@ -1,9 +1,10 @@
 package db
 
 import (
+	"errors"
+	"fmt"
 	"github.com/fzzy/radix/redis"
 	"github.com/nestorsokil/goto-url/util"
-	"log"
 	"strconv"
 )
 
@@ -91,13 +92,10 @@ func asRecord(hash map[string]string) *Record {
 	return record
 }
 
-func NewRedisDs(config *util.RedisConfig) DataSource {
-	var rds DataSource
+func NewRedisDs(config *util.RedisConfig) (DataSource, error) {
 	conn, err := redis.Dial("tcp", config.RedisUrl)
 	if err != nil {
-		log.Fatalf("Error creating Redis connection: %v", err)
+		return nil, errors.New(fmt.Sprintf("Error creating Redis connection: %v", err))
 	}
-
-	rds = &RedisDataSource{conn}
-	return rds
+	return &RedisDataSource{conn}, nil
 }

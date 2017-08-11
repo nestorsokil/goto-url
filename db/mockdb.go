@@ -46,6 +46,6 @@ func (ds *MockDataSource) Shutdown() {
 	// skip
 }
 
-func NewMockDS() DataSource {
-	return &MockDataSource{make(map[string]*Record)}
+func NewMockDS() (DataSource, error) {
+	return &MockDataSource{make(map[string]*Record)}, nil
 }

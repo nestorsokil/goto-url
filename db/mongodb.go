@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 	"net"
 
 	"github.com/nestorsokil/goto-url/util"
@@ -70,12 +69,15 @@ func (mongo *MongoDataSource) Shutdown() {
 	mongo.session.Close()
 }
 
-func NewMongoDS(config *util.MongoConfig) DataSource {
-	session := newMongoSession(config)
-	return &MongoDataSource{session, config.DatabaseName}
+func NewMongoDS(config *util.MongoConfig) (DataSource, error) {
+	session, err := newMongoSession(config)
+	if err != nil {
+		return nil, err
+	}
+	return &MongoDataSource{session, config.DatabaseName}, nil
 }
 
-func newMongoSession(config *util.MongoConfig) *mgo.Session {
+func newMongoSession(config *util.MongoConfig) (*mgo.Session, error) {
 	var session *mgo.Session
 	var err error
 	if config.EnableTLS {
@@ -91,13 +93,13 @@ func newMongoSession(config *util.MongoConfig) *mgo.Session {
 		}
 		session, err = mgo.DialWithInfo(dialInfo)
 		if err != nil {
-			log.Fatal("[FATAL] ", err)
+			return nil, err
 		}
 	} else {
 		session, err = mgo.Dial(config.MongoUrls[0])
 		if err != nil {
-			log.Fatal("[FATAL] ", err)
+			return nil, err
 		}
 	}
-	return session
+	return session, nil
 }

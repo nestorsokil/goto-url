@@ -3,19 +3,20 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/nestorsokil/gl"
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/util"
-	"log"
 	"time"
 )
 
 type UrlService struct {
 	dataSource db.DataSource
 	conf       *util.ApplicationConfig
+	logger     gl.Logger
 }
 
-func New(dataSource db.DataSource, conf *util.ApplicationConfig) UrlService {
-	return UrlService{dataSource, conf}
+func New(dataSource db.DataSource, conf *util.ApplicationConfig, logger gl.Logger) UrlService {
+	return UrlService{dataSource, conf, logger}
 }
 
 func (s *UrlService) RequestBuilder() *RequestBuilder {
@@ -98,9 +99,10 @@ func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
 			now := time.Now().UnixNano()
 			removed, err := s.dataSource.DeleteAllExpiredBefore(now)
 			if err != nil {
-				log.Println("[ERROR]", err)
+				s.logger.Error(err.Error())
+			} else if removed > 0 {
+				s.logger.Info("Expired records removed. Count: %d", removed)
 			}
-			log.Println("[INFO] Expired records removed. Count:", removed)
 		}
 	}
 }
@@ -110,7 +112,7 @@ var ErrNotFound = errors.New("Record not found.")
 func (s *UrlService) FindByKey(key string) (*db.Record, error) {
 	record, err := s.dataSource.Find(key)
 	if err != nil {
-		log.Printf("[ERROR] FindByKey(%s) : %v", key, err)
+		s.logger.Error("FindByKey(%s) : %v", key, err)
 		return nil, ErrNotFound
 	}
 	if record == nil {
