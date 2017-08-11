@@ -6,13 +6,12 @@ import (
 )
 
 type DataSource interface {
-	// TODO refactor to (record, err)
-	Find(key string) *Record
-	// TODO refactor to (record, err)
-	FindShort(url string) *Record
-	Save(newRecord Record) error
+	Find(key string) (*Record, error)
+	FindShort(url string) (*Record, error)
+	Save(*Record) error
 	ExistsKey(key string) (bool, error)
 	DeleteAllExpiredBefore(time int64) (removed int, err error)
+	Update(*Record) error
 
 	Shutdown()
 }
@@ -21,6 +20,7 @@ type Record struct {
 	Key        string
 	URL        string
 	Expiration int64
+	MustExpire bool
 }
 
 func CreateDataSource(config *util.ApplicationConfig) DataSource {

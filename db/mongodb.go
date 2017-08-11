@@ -19,25 +19,25 @@ func (mongo *MongoDataSource) query() *mgo.Database {
 	return mongo.session.DB(mongo.database)
 }
 
-func (mongo *MongoDataSource) Find(key string) *Record {
+func (mongo *MongoDataSource) Find(key string) (*Record, error) {
 	var result Record
 	err := mongo.query().C("records").Find(bson.M{"key": key}).One(&result)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return &result
+	return &result, nil
 }
 
-func (mongo *MongoDataSource) FindShort(url string) *Record {
+func (mongo *MongoDataSource) FindShort(url string) (*Record, error) {
 	var result Record
 	err := mongo.query().C("records").Find(bson.M{"url": url}).One(&result)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return &result
+	return &result, nil
 }
 
-func (mongo *MongoDataSource) Save(newRecord Record) error {
+func (mongo *MongoDataSource) Save(newRecord *Record) error {
 	err := mongo.query().C("records").Insert(newRecord)
 	if err != nil {
 		return err
@@ -60,6 +60,10 @@ func (mongo *MongoDataSource) DeleteAllExpiredBefore(time int64) (removed int, e
 		return 0, err
 	}
 	return info.Removed, nil
+}
+
+func (mongo *MongoDataSource) Update(record *Record) error {
+	return mongo.query().C("records").Update(bson.M{"key": record.Key}, record)
 }
 
 func (mongo *MongoDataSource) Shutdown() {

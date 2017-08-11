@@ -75,9 +75,9 @@ func redirect(response http.ResponseWriter, request *http.Request) {
 		respond(response, http.StatusBadRequest, "No key provided.")
 		return
 	}
-	record := urlService.FindByKey(key)
-	if record == nil {
-		respond(response, http.StatusNotFound, "URL not found.")
+	record, err := urlService.FindByKey(key)
+	if err != nil {
+		respond(response, http.StatusNotFound, err.Error())
 		return
 	}
 	http.Redirect(response, request, record.URL, http.StatusMovedPermanently)

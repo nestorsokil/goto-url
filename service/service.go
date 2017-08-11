@@ -55,11 +55,11 @@ func (s *UrlService) createWithCustomKey(customKey, url string, expireIn int64) 
 		message := fmt.Sprintf("The custom key '%s' already exists", customKey)
 		return nil, errors.New(message)
 	}
-	return s.createRecord(customKey, url, expireIn)
+	return s.createRecord(customKey, url, expireIn, true)
 }
 
 func (s *UrlService) createWithRandKey(url string, expireIn int64) (*db.Record, error) {
-	record := s.dataSource.FindShort(url)
+	record, _ := s.dataSource.FindShort(url)
 	if record != nil {
 		return record, nil
 	}
@@ -67,19 +67,24 @@ func (s *UrlService) createWithRandKey(url string, expireIn int64) (*db.Record, 
 	if err != nil {
 		return nil, err
 	}
-	return s.createRecord(key, url, expireIn)
+	return s.createRecord(key, url, expireIn, false)
 }
 
-func (s *UrlService) createRecord(key, url string, expireIn int64) (*db.Record, error) {
-	now := time.Now().UnixNano()
-	expiration := now + expireIn*time.Hour.Nanoseconds()
-	rec := db.Record{Key: key, URL: url, Expiration: expiration}
+func (s *UrlService) createRecord(key, url string, expireIn int64, mustExpire bool) (*db.Record, error) {
+	expiration := getExpiration(expireIn)
+	rec := &db.Record{Key: key, URL: url, Expiration: expiration, MustExpire:mustExpire}
 	err := s.dataSource.Save(rec)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	return &rec, nil
+	return rec, nil
+}
+
+func getExpiration(expireIn int64) int64 {
+	now := time.Now().UnixNano()
+	expiration := now + expireIn*time.Hour.Nanoseconds()
+	return expiration
 }
 
 func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
@@ -100,8 +105,23 @@ func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
 	}
 }
 
-func (s *UrlService) FindByKey(key string) *db.Record {
-	return s.dataSource.Find(key)
+var ErrNotFound = errors.New("Record not found.")
+
+func (s *UrlService) FindByKey(key string) (*db.Record, error) {
+	record, err := s.dataSource.Find(key)
+	if err != nil {
+		log.Printf("[ERROR] FindByKey(%s) : %v", key, err)
+		return nil, ErrNotFound
+	}
+	if record == nil {
+		return nil, ErrNotFound
+	}
+	if record.MustExpire {
+		return record, nil
+	}
+	record.Expiration = getExpiration(s.conf.ExpirationTimeHours)
+	s.dataSource.Update(record)
+	return record, nil
 }
 
 func (s *UrlService) ConstructUrl(host, key string) string {

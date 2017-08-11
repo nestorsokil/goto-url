@@ -11,23 +11,23 @@ type RedisDataSource struct {
 	client *redis.Client
 }
 
-func (rds *RedisDataSource) Find(key string) *Record {
+func (rds *RedisDataSource) Find(key string) (*Record, error) {
 	hash, err := rds.client.Cmd("HGETALL", "record:"+key).Hash()
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return asRecord(hash)
+	return asRecord(hash), nil
 }
 
-func (rds *RedisDataSource) FindShort(url string) *Record {
+func (rds *RedisDataSource) FindShort(url string) (*Record, error) {
 	hash, err := rds.client.Cmd("ZRANGEBYSCORE", "record.URL.index", url).Hash()
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return asRecord(hash)
+	return asRecord(hash), nil
 }
 
-func (rds *RedisDataSource) Save(newRecord Record) error {
+func (rds *RedisDataSource) Save(newRecord *Record) error {
 	key, url, exp := newRecord.Key, newRecord.URL, newRecord.Expiration
 	reply := rds.client.Cmd("HMSET", "record:"+key, "key", key, "URL", url, "expiration", exp)
 	if reply.Err != nil {
@@ -38,7 +38,7 @@ func (rds *RedisDataSource) Save(newRecord Record) error {
 }
 
 func (rds *RedisDataSource) ExistsKey(key string) (bool, error) {
-	return rds.Find(key) != nil, nil
+	return rds.client.Cmd("EXISTS", "records:"+key).Bool()
 }
 
 func (rds *RedisDataSource) DeleteAllExpiredBefore(time int64) (removed int, err error) {
@@ -52,11 +52,15 @@ func (rds *RedisDataSource) DeleteAllExpiredBefore(time int64) (removed int, err
 		}
 		record := asRecord(hash)
 		if record.Expiration < time {
-			rds.client.Cmd("HDEL", "record:"+record.Key)
+			rds.client.Cmd("DEL", "record:"+record.Key)
 			removed++
 		}
 	}
 	return removed, nil
+}
+
+func (rds *RedisDataSource) Update(record *Record) error {
+	return rds.Save(record)
 }
 
 func (rds *RedisDataSource) Shutdown() {
