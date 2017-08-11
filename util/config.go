@@ -10,7 +10,7 @@ import (
 const (
 	MONGO     = "mongo"
 	IN_MEMORY = "inMemory"
-	REDIS = "redis"
+	REDIS     = "redis"
 )
 
 var configDirectory string

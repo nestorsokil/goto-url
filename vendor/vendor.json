@@ -33,6 +33,66 @@
 			"revisionTime": "2017-07-03T15:07:09Z"
 		},
 		{
+			"checksumSHA1": "B6lW04S6vi88yGVHh8zUom1Qybk=",
+			"path": "go.uber.org/atomic",
+			"revision": "70bd1261d36be490ebd22a62b385a3c5d23b6240",
+			"revisionTime": "2017-05-09T22:23:09Z"
+		},
+		{
+			"checksumSHA1": "5RrDRTXJ18lqJ5UcDq8ZOUYlt6k=",
+			"path": "go.uber.org/multierr",
+			"revision": "3c4937480c32f4c13a875a1829af76c98ca3d40a",
+			"revisionTime": "2017-06-30T17:54:37Z"
+		},
+		{
+			"checksumSHA1": "y4aSWHAD4NUqVQ5vetNJteOgeaA=",
+			"path": "go.uber.org/zap/buffer",
+			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
+			"revisionTime": "2017-08-02T17:13:41Z"
+		},
+		{
+			"checksumSHA1": "Y0uE8U8wxuPku0bFZyVmYLznd/o=",
+			"path": "go.uber.org/zap/internal/bufferpool",
+			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
+			"revisionTime": "2017-08-02T17:13:41Z"
+		},
+		{
+			"checksumSHA1": "AA/i5mzFuQBeFcE+d9ZBLPropjU=",
+			"path": "go.uber.org/zap/internal/color",
+			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
+			"revisionTime": "2017-08-02T17:13:41Z"
+		},
+		{
+			"checksumSHA1": "fjEB1pcePOWjEmayG54E92JYgWk=",
+			"path": "go.uber.org/zap/internal/exit",
+			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
+			"revisionTime": "2017-08-02T17:13:41Z"
+		},
+		{
+			"checksumSHA1": "y4AwRoBbsSAk5rWPgtFmHS9TF6Y=",
+			"path": "go.uber.org/zap/zapcore",
+			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
+			"revisionTime": "2017-08-02T17:13:41Z"
+		},
+		{
+			"checksumSHA1": "8wbHSD24FGJUJDS1F6wbtEt8z+w=",
+			"path": "golang.org/x/crypto/ssh/terminal",
+			"revision": "b176d7def5d71bdd214203491f89843ed217f420",
+			"revisionTime": "2017-07-23T04:49:35Z"
+		},
+		{
+			"checksumSHA1": "Ws4nftdYhMEd8vZPFv1CMy1N8Nw=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "e42485b6e20ae7d2304ec72e535b103ed350cc02",
+			"revisionTime": "2017-08-09T17:40:02Z"
+		},
+		{
+			"checksumSHA1": "LkAsnLUlAZSg3lRYk7BEyNfog3A=",
+			"path": "golang.org/x/sys/windows",
+			"revision": "e42485b6e20ae7d2304ec72e535b103ed350cc02",
+			"revisionTime": "2017-08-09T17:40:02Z"
+		},
+		{
 			"checksumSHA1": "YFQU7VULoTU4TwPz3V97b2exyxE=",
 			"path": "gopkg.in/mgo.v2",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",

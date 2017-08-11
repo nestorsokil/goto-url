@@ -30,7 +30,9 @@ func (rds *RedisDataSource) FindShort(url string) (*Record, error) {
 func (rds *RedisDataSource) Save(newRecord *Record) error {
 	key, url, exp, mustExp := newRecord.Key, newRecord.URL,
 		newRecord.Expiration, newRecord.MustExpire
-	reply := rds.client.Cmd("HMSET", "record:"+key, "key", key, "URL", url, "expiration", exp, "mustExpire", mustExp)
+	reply := rds.client.Cmd(
+		"HMSET", "record:"+key, "key", key, "URL", url,
+		"expiration", exp, "mustExpire", mustExp)
 	if reply.Err != nil {
 		return reply.Err
 	}

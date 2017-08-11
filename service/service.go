@@ -72,7 +72,7 @@ func (s *UrlService) createWithRandKey(url string, expireIn int64) (*db.Record, 
 
 func (s *UrlService) createRecord(key, url string, expireIn int64, mustExpire bool) (*db.Record, error) {
 	expiration := getExpiration(expireIn)
-	rec := &db.Record{Key: key, URL: url, Expiration: expiration, MustExpire:mustExpire}
+	rec := &db.Record{Key: key, URL: url, Expiration: expiration, MustExpire: mustExpire}
 	err := s.dataSource.Save(rec)
 	if err != nil {
 		fmt.Println(err.Error())

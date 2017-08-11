@@ -20,10 +20,12 @@ func main() {
 	conf = util.LoadConfig()
 
 	globalLog := conf.GetGlobalLogFile()
+	defer globalLog.Sync()
 	defer globalLog.Close()
 	log.SetOutput(globalLog)
 
 	requestLog := conf.GetRequestLogFile()
+	defer globalLog.Sync()
 	defer requestLog.Close()
 
 	ds := db.CreateDataSource(&conf)

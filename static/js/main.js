@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     $("#submit-button").click(function () {
         $.ajax({
             url: "/short",
@@ -23,5 +22,4 @@ $(document).ready(function () {
             }
         })
     });
-
 });
