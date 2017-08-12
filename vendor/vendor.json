@@ -3,80 +3,56 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "ARh2DTQwVGJJhWB/2VC1t5cNNo8=",
+			"checksumSHA1": "X96SEEle/PoaVjmm+xxVgnTtus0=",
 			"path": "github.com/fzzy/radix/redis",
 			"revision": "3528e87a910c6730810cec1be187f989d7d9442a",
 			"revisionTime": "2015-07-14T16:59:33Z"
 		},
 		{
-			"checksumSHA1": "REBpDu3urvrKVbZY751WlBW2Rgc=",
+			"checksumSHA1": "iBmwM5Dlp3zibnyyFfoHkgwrhWE=",
 			"path": "github.com/fzzy/radix/redis/resp",
 			"revision": "3528e87a910c6730810cec1be187f989d7d9442a",
 			"revisionTime": "2015-07-14T16:59:33Z"
 		},
 		{
-			"checksumSHA1": "IkPM2QLv9urri7S49wzroQx9oXA=",
+			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
 			"path": "github.com/gorilla/context",
 			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
 			"revisionTime": "2016-08-17T18:46:32Z"
 		},
 		{
-			"checksumSHA1": "4OqsCtUfKO1c0KlmlgS4JBt3g4E=",
+			"checksumSHA1": "/lWfaq/Ok+El1amGaf3wPY5JpUc=",
 			"path": "github.com/gorilla/handlers",
 			"revision": "a4d79d4487c2430a17d9dc8a1f74d1a6ed6908ca",
 			"revisionTime": "2017-06-02T15:16:48Z"
 		},
 		{
-			"checksumSHA1": "qvsEhA+BntKV5nqjCARYL2gLSzo=",
+			"checksumSHA1": "hIbmXmNbwyP44fi1hh6zJrMcYws=",
 			"path": "github.com/gorilla/mux",
 			"revision": "ac112f7d75a0714af1bd86ab17749b31f7809640",
 			"revisionTime": "2017-07-03T15:07:09Z"
 		},
 		{
-			"checksumSHA1": "3u37fFFdbry5c7K4Zl/2A9WWLg0=",
+			"checksumSHA1": "us0FWSoEhyK/gLhiq8e9Dy2YS8U=",
 			"path": "github.com/nestorsokil/gl",
 			"revision": "f5522eb43a5634e756656526c20d8a357ba391aa",
 			"revisionTime": "2017-08-12T09:57:46Z"
 		},
 		{
-			"checksumSHA1": "B6lW04S6vi88yGVHh8zUom1Qybk=",
+			"checksumSHA1": "3IdEHJfBkeEE8guKA2tcA8Fv6eg=",
 			"path": "go.uber.org/atomic",
 			"revision": "70bd1261d36be490ebd22a62b385a3c5d23b6240",
 			"revisionTime": "2017-05-09T22:23:09Z"
 		},
 		{
-			"checksumSHA1": "5RrDRTXJ18lqJ5UcDq8ZOUYlt6k=",
+			"checksumSHA1": "JDGx7hehaQunZySwPs7yvdUs2m8=",
 			"path": "go.uber.org/multierr",
 			"revision": "3c4937480c32f4c13a875a1829af76c98ca3d40a",
 			"revisionTime": "2017-06-30T17:54:37Z"
 		},
 		{
-			"checksumSHA1": "y4aSWHAD4NUqVQ5vetNJteOgeaA=",
-			"path": "go.uber.org/zap/buffer",
-			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
-			"revisionTime": "2017-08-02T17:13:41Z"
-		},
-		{
-			"checksumSHA1": "Y0uE8U8wxuPku0bFZyVmYLznd/o=",
-			"path": "go.uber.org/zap/internal/bufferpool",
-			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
-			"revisionTime": "2017-08-02T17:13:41Z"
-		},
-		{
-			"checksumSHA1": "AA/i5mzFuQBeFcE+d9ZBLPropjU=",
+			"checksumSHA1": "uC0L9eCSAYcCWNC8udJk/t1vvIU=",
 			"path": "go.uber.org/zap/internal/color",
-			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
-			"revisionTime": "2017-08-02T17:13:41Z"
-		},
-		{
-			"checksumSHA1": "fjEB1pcePOWjEmayG54E92JYgWk=",
-			"path": "go.uber.org/zap/internal/exit",
-			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
-			"revisionTime": "2017-08-02T17:13:41Z"
-		},
-		{
-			"checksumSHA1": "y4AwRoBbsSAk5rWPgtFmHS9TF6Y=",
-			"path": "go.uber.org/zap/zapcore",
 			"revision": "e68420e36ce87d08dc24bb74bfc316a0a57c5f7b",
 			"revisionTime": "2017-08-02T17:13:41Z"
 		},
@@ -99,31 +75,31 @@
 			"revisionTime": "2017-08-09T17:40:02Z"
 		},
 		{
-			"checksumSHA1": "YFQU7VULoTU4TwPz3V97b2exyxE=",
+			"checksumSHA1": "1D8GzeoFGUs5FZOoyC2DpQg8c5Y=",
 			"path": "gopkg.in/mgo.v2",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
 			"revisionTime": "2016-08-18T02:01:20Z"
 		},
 		{
-			"checksumSHA1": "Kpt9VvtG+deoQ+p34F2CeTofTik=",
+			"checksumSHA1": "YsB2DChSV9HxdzHaKATllAUKWSI=",
 			"path": "gopkg.in/mgo.v2/bson",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
 			"revisionTime": "2016-08-18T02:01:20Z"
 		},
 		{
-			"checksumSHA1": "9tMleZvl/yjpkj7oO3pOfZc+MJw=",
+			"checksumSHA1": "XQsrqoNT1U0KzLxOFcAZVvqhLfk=",
 			"path": "gopkg.in/mgo.v2/internal/json",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
 			"revisionTime": "2016-08-18T02:01:20Z"
 		},
 		{
-			"checksumSHA1": "WnXjUmdgl3mTwwqYBxbO974iCe8=",
+			"checksumSHA1": "LEvMCnprte47qdAxWvQ/zRxVF1U=",
 			"path": "gopkg.in/mgo.v2/internal/sasl",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
 			"revisionTime": "2016-08-18T02:01:20Z"
 		},
 		{
-			"checksumSHA1": "CrciG7woshiINwZxPsxisgDGL3Y=",
+			"checksumSHA1": "+1WDRPaOphSCmRMxVPIPBV4aubc=",
 			"path": "gopkg.in/mgo.v2/internal/scram",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
 			"revisionTime": "2016-08-18T02:01:20Z"
