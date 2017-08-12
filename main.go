@@ -11,7 +11,6 @@ import (
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/service"
 	"github.com/nestorsokil/goto-url/util"
-	"time"
 )
 
 var urlService service.UrlService
@@ -40,6 +39,7 @@ func main() {
 	logger = gl.Simple().
 		WriteTo(globalLog).
 		WithLevel(gl.LEVEL_DEBUG).
+		WithPrefix("Main").
 		Build()
 	urlService = service.New(ds, &conf, logger)
 	go urlService.ClearRecordsAsync(stop)
@@ -54,11 +54,6 @@ func main() {
 
 	staticFS := http.FileServer(http.Dir("static/"))
 	http.Handle("/static/", http.StripPrefix("/static/", staticFS))
-
-	for {
-		time.Sleep(1 * time.Second)
-		logger.Info("Running...")
-	}
 
 	logger.Info("Starting server on %v.", conf.Port)
 	http.ListenAndServe(conf.Port, withLog)
