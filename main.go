@@ -19,7 +19,6 @@ var logger gl.Logger
 
 func main() {
 	conf = util.LoadConfig()
-
 	globalLog := conf.GetGlobalLogFile()
 	defer globalLog.Sync()
 	defer globalLog.Close()

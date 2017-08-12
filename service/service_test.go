@@ -6,12 +6,15 @@ import (
 	"math"
 	"testing"
 	"time"
+	"github.com/nestorsokil/gl"
 )
 
-func TestUrlService_GetRecord(t *testing.T) {
-	conf := &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 1}
-	subject := New(db.NewMockDS(), conf)
+var conf = &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 1, ClearTimeSeconds: 1}
+var ds, _ = db.NewMockDS()
+var logger = gl.Simple().WithLevel(gl.LEVEL_DEBUG).Build()
+var subject = New(ds, conf, logger)
 
+func TestUrlService_GetRecord(t *testing.T) {
 	testUrl := "http://url.com"
 	record, _ := subject.GetRecord(subject.RequestBuilder().ForUrl(testUrl).Build())
 	key, url := record.Key, record.URL
@@ -32,8 +35,6 @@ func TestUrlService_GetRecord(t *testing.T) {
 }
 
 func TestUrlService_GetRecord_WithCustomKey(t *testing.T) {
-	conf := &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 1}
-	subject := New(db.NewMockDS(), conf)
 	testUrl := "http://url.com"
 	customKey := "bla/bla/bla"
 	record, err := subject.GetRecord(
@@ -60,24 +61,21 @@ func TestUrlService_GetRecord_WithCustomKey(t *testing.T) {
 }
 
 func TestService_FindByKey(t *testing.T) {
-	conf := &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 1}
-	subject := New(db.NewMockDS(), conf)
-
 	testUrl := "http://url.com"
 	record, err := subject.GetRecord(subject.RequestBuilder().ForUrl(testUrl).Build())
 	if err != nil {
 		t.Error(err)
 	}
-
-	record = subject.FindByKey(record.Key)
+	record, err = subject.FindByKey(record.Key)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 	if record == nil {
 		t.Errorf("Record was not found")
 	}
-
 	if record.URL != testUrl {
 		t.Errorf("Expected: '%s', actual: '%s'", testUrl, record.URL)
 	}
-
 	now := time.Now().UnixNano()
 	shouldExpireInApprox := now + conf.ExpirationTimeHours*time.Hour.Nanoseconds()
 	countErr := 1 * time.Second.Nanoseconds()
@@ -89,13 +87,13 @@ func TestService_FindByKey(t *testing.T) {
 }
 
 func TestUrlService_ClearRecordsAsync(t *testing.T) {
-	conf := &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 0, ClearTimeSeconds: 1}
-	subject := New(db.NewMockDS(), conf)
-
+	subject.conf.ExpirationTimeHours = 0
 	record, _ := subject.GetRecord(
 		subject.RequestBuilder().ForUrl("http://url.com").Build())
-	shouldBeOk := subject.FindByKey(record.Key)
-
+	shouldBeOk, err := subject.FindByKey(record.Key)
+	if err != nil {
+		t.Error(err.Error())
+	}
 	if shouldBeOk == nil {
 		t.Error("Record was not persisted.")
 	}
@@ -105,7 +103,10 @@ func TestUrlService_ClearRecordsAsync(t *testing.T) {
 	time.Sleep(time.Duration((conf.ClearTimeSeconds + 1) * time.Second.Nanoseconds()))
 	done <- struct{}{}
 
-	shouldBeNil := subject.FindByKey(record.Key)
+	shouldBeNil, err := subject.FindByKey(record.Key)
+	if err != ErrNotFound {
+		t.Errorf("Expected %v, actual: %v", ErrNotFound, err)
+	}
 	if shouldBeNil != nil {
 		t.Errorf("Expected nil!")
 	}
