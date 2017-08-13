@@ -36,6 +36,7 @@ func CreateDataSource(config *util.ApplicationConfig) (DataSource, error) {
 		redisConfig := util.LoadRedisConfig()
 		return NewRedisDs(&redisConfig)
 	default:
-		return nil, errors.New(fmt.Sprintf("Unrecognized db option: %s", dsType))
+		e := fmt.Sprintf("Unrecognized db option: %s", dsType)
+		return nil, errors.New(e)
 	}
 }

@@ -95,7 +95,8 @@ func asRecord(hash map[string]string) *Record {
 func NewRedisDs(config *util.RedisConfig) (DataSource, error) {
 	conn, err := redis.Dial("tcp", config.RedisUrl)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Error creating Redis connection: %v", err))
+		e := fmt.Sprintf("Error creating Redis connection: %v", err)
+		return nil, errors.New(e)
 	}
 	return &RedisDataSource{conn}, nil
 }

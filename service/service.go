@@ -15,6 +15,8 @@ type UrlService struct {
 	logger     gl.Logger
 }
 
+var ErrNotFound = errors.New("Record not found.")
+
 func New(dataSource db.DataSource, conf *util.ApplicationConfig, logger gl.Logger) UrlService {
 	return UrlService{dataSource, conf, logger}
 }
@@ -27,10 +29,19 @@ func (s *UrlService) GetRecord(request Request) (*db.Record, error) {
 	if request.url == "" {
 		return nil, errors.New("No URL provided.")
 	}
+	var result *db.Record
+	var err error
 	if request.customKey != "" {
-		return s.createWithCustomKey(request.customKey, request.url, request.expire)
+		result, err = s.createWithCustomKey(request.customKey, request.url, request.expire)
+	} else {
+		result, err = s.createWithRandKey(request.url, request.expire)
 	}
-	return s.createWithRandKey(request.url, request.expire)
+
+	if err != nil {
+		s.logger.Error(err.Error())
+		return nil, err
+	}
+	return result, nil
 }
 
 func (s *UrlService) createKey() (string, error) {
@@ -60,7 +71,7 @@ func (s *UrlService) createWithCustomKey(customKey, url string, expireIn int64) 
 }
 
 func (s *UrlService) createWithRandKey(url string, expireIn int64) (*db.Record, error) {
-	record, _ := s.dataSource.FindShort(url)
+	record, err := s.dataSource.FindShort(url)
 	if record != nil {
 		return record, nil
 	}
@@ -76,7 +87,6 @@ func (s *UrlService) createRecord(key, url string, expireIn int64, mustExpire bo
 	rec := &db.Record{Key: key, URL: url, Expiration: expiration, MustExpire: mustExpire}
 	err := s.dataSource.Save(rec)
 	if err != nil {
-		fmt.Println(err.Error())
 		return nil, err
 	}
 	return rec, nil
@@ -106,8 +116,6 @@ func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
 		}
 	}
 }
-
-var ErrNotFound = errors.New("Record not found.")
 
 func (s *UrlService) FindByKey(key string) (*db.Record, error) {
 	record, err := s.dataSource.Find(key)

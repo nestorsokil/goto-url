@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $("#submit-button").click(function () {
         $.ajax({
-            url: "/short",
+            url: "/url/short",
             type: "get",
             data: {
                 url : $("#url-input").val(),
