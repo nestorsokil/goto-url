@@ -47,9 +47,6 @@ func main() {
 	router.Handle("/url/short", rest.Shorten(urlService)).Methods("GET")
 	withLog := handlers.LoggingHandler(requestLog, router)
 
-	staticFS := http.FileServer(http.Dir("static/"))
-	http.Handle("/static/", http.StripPrefix("/static/", staticFS))
-
 	logger.Info("Starting server on %v.", conf.Port)
 	http.ListenAndServe(conf.Port, withLog)
 }
