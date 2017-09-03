@@ -75,7 +75,7 @@ func parseConfig(fromFile string, toStruct interface{}) {
 	}
 }
 
-func (conf *ApplicationConfig) GetGlobalLogFile() *os.File {
+func (conf *ApplicationConfig) GetRequestLogFile() *os.File {
 	logDir := filepath.Dir(conf.LogDir)
 	if logDir != "" {
 		err := os.MkdirAll(logDir, os.ModePerm)
@@ -83,15 +83,6 @@ func (conf *ApplicationConfig) GetGlobalLogFile() *os.File {
 			log.Fatal(err)
 		}
 	}
-	logFile, err := os.OpenFile(conf.LogDir+string(os.PathSeparator)+
-		"server.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0777)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return logFile
-}
-
-func (conf *ApplicationConfig) GetRequestLogFile() *os.File {
 	logFile, err := os.OpenFile(conf.LogDir+string(os.PathSeparator)+
 		"request.log", os.O_CREATE, 0777)
 	if err != nil {

@@ -1,18 +1,17 @@
 package service
 
 import (
-	"github.com/nestorsokil/goto-url/db"
-	"github.com/nestorsokil/goto-url/util"
 	"math"
 	"testing"
 	"time"
-	"github.com/nestorsokil/gl"
+
+	"github.com/nestorsokil/goto-url/db"
+	"github.com/nestorsokil/goto-url/util"
 )
 
 var conf = &util.ApplicationConfig{KeyLength: 5, ExpirationTimeHours: 1, ClearTimeSeconds: 1}
 var ds, _ = db.NewMockDS()
-var logger = gl.Simple().WithLevel(gl.LEVEL_DEBUG).Build()
-var subject = New(ds, conf, logger)
+var subject = New(ds, conf)
 
 func TestUrlService_GetRecord(t *testing.T) {
 	testUrl := "http://url.com"

@@ -3,22 +3,22 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/nestorsokil/gl"
+	"time"
+
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/util"
-	"time"
+	log "github.com/sirupsen/logrus"
 )
 
 type UrlService struct {
 	dataSource db.DataSource
 	conf       *util.ApplicationConfig
-	logger     gl.Logger
 }
 
 var ErrNotFound = errors.New("Record not found.")
 
-func New(dataSource db.DataSource, conf *util.ApplicationConfig, logger gl.Logger) UrlService {
-	return UrlService{dataSource, conf, logger}
+func New(dataSource db.DataSource, conf *util.ApplicationConfig) UrlService {
+	return UrlService{dataSource, conf}
 }
 
 func (s *UrlService) RequestBuilder() *RequestBuilder {
@@ -38,7 +38,7 @@ func (s *UrlService) GetRecord(request Request) (*db.Record, error) {
 	}
 
 	if err != nil {
-		s.logger.Error(err.Error())
+		log.Error(err.Error())
 		return nil, err
 	}
 	return result, nil
@@ -109,9 +109,9 @@ func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
 			now := time.Now().UnixNano()
 			removed, err := s.dataSource.DeleteAllExpiredBefore(now)
 			if err != nil {
-				s.logger.Error(err.Error())
+				log.Error(err.Error())
 			} else if removed > 0 {
-				s.logger.Info("Expired records removed. Count: %d", removed)
+				log.Infof("Expired records removed. Count: %d", removed)
 			}
 		}
 	}
@@ -120,7 +120,7 @@ func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
 func (s *UrlService) FindByKey(key string) (*db.Record, error) {
 	record, err := s.dataSource.Find(key)
 	if err != nil {
-		s.logger.Error("FindByKey(%s) : %v", key, err)
+		log.Errorf("FindByKey(%s) : %v", key, err)
 		return nil, ErrNotFound
 	}
 	if record == nil {
