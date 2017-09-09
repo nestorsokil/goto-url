@@ -90,3 +90,11 @@ func (conf *ApplicationConfig) GetRequestLogFile() *os.File {
 	}
 	return logFile
 }
+
+func (conf *ApplicationConfig) GetStaticsDir() string {
+	statics := os.Getenv("GO_TO_URL_STATIC")
+	if statics != "" {
+		return statics
+	}
+	return "static"
+}

@@ -32,7 +32,7 @@ func main() {
 	urlService := service.New(ds, &conf)
 	go urlService.ClearRecordsAsync(stop)
 
-	fs := http.FileServer(http.Dir("static"))
+	fs := http.FileServer(http.Dir(conf.GetStaticsDir()))
 	router := mux.NewRouter()
 	router.PathPrefix("/home/").Handler(http.StripPrefix("/home/", fs))
 	router.Handle("/", rest.RedirectToIndex()).Methods("GET")
