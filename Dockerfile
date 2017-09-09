@@ -1,12 +1,5 @@
 FROM scratch
-
-ADD goto-url /app/goto-url
-ADD config /app/config
-ADD static /app/static
-
-ENV GO_TO_URL_CONFIG=/app/config/
-ENV GO_TO_URL_STATIC=/app/static
-
+ADD deploy /app
 CMD ["/app/goto-url"]
 
 # sudo docker build -t goto-url .

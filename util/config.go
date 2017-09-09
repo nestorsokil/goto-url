@@ -41,7 +41,7 @@ type RedisConfig struct {
 func LoadConfig() ApplicationConfig {
 	configDirectory = os.Getenv("GO_TO_URL_CONFIG")
 	if configDirectory == "" {
-		configDirectory = "config/"
+		configDirectory = "static/config/"
 	}
 	var conf ApplicationConfig
 	configPath := configDirectory + "conf.json"
@@ -91,10 +91,10 @@ func (conf *ApplicationConfig) GetRequestLogFile() *os.File {
 	return logFile
 }
 
-func (conf *ApplicationConfig) GetStaticsDir() string {
+func (conf *ApplicationConfig) GetWebStaticDir() string {
 	statics := os.Getenv("GO_TO_URL_STATIC")
 	if statics != "" {
 		return statics
 	}
-	return "static"
+	return "static/web"
 }
