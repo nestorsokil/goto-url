@@ -15,19 +15,24 @@ type UrlService struct {
 	conf       *util.ApplicationConfig
 }
 
-var ErrNotFound = errors.New("Record not found.")
+// ErrNotFound is an error returned in case no suitable records were found
+var ErrNotFound = errors.New("record not found")
 
+// New returns a new UrlService
 func New(dataSource db.DataSource, conf *util.ApplicationConfig) UrlService {
 	return UrlService{dataSource, conf}
 }
 
+// RequestBuilder returns a new builder object for chained request creation
 func (s *UrlService) RequestBuilder() *RequestBuilder {
 	return builder(s.conf)
 }
 
+// GetRecord returns a record for the given request if there is one in data source
+// If not - a new record is created
 func (s *UrlService) GetRecord(request Request) (*db.Record, error) {
 	if request.url == "" {
-		return nil, errors.New("No URL provided.")
+		return nil, errors.New("no URL provided")
 	}
 	var result *db.Record
 	var err error
@@ -41,6 +46,7 @@ func (s *UrlService) GetRecord(request Request) (*db.Record, error) {
 		log.Error(err.Error())
 		return nil, err
 	}
+	log.Debugf("Registered record with key '%s' for URL '%s'", result.Key, result.URL)
 	return result, nil
 }
 
@@ -98,6 +104,8 @@ func getExpiration(expireIn int64) int64 {
 	return expiration
 }
 
+// ClearRecordsAsync starts an infinite loop to check for expired records and delete them
+// Use in separate goroutine to run in background
 func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
 	waitTime := time.Duration(s.conf.ClearTimeSeconds * time.Second.Nanoseconds())
 	for {
@@ -117,6 +125,7 @@ func (s *UrlService) ClearRecordsAsync(stopSignal <-chan struct{}) {
 	}
 }
 
+// FindByKey returns a record for the provided key
 func (s *UrlService) FindByKey(key string) (*db.Record, error) {
 	record, err := s.dataSource.Find(key)
 	if err != nil {
@@ -131,10 +140,12 @@ func (s *UrlService) FindByKey(key string) (*db.Record, error) {
 	}
 	record.Expiration = getExpiration(s.conf.ExpirationTimeHours)
 	s.dataSource.Update(record)
+	log.Debugf("Record for URL '%s' requested.", record.URL)
 	return record, nil
 }
 
-func (s *UrlService) ConstructUrl(host, key string) string {
+// ConstructURL creates a valid short URL
+func (s *UrlService) ConstructURL(host, key string) string {
 	var base string
 	if s.conf.DevMode == true {
 		base = s.conf.ApplicationUrl

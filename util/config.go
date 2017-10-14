@@ -2,9 +2,10 @@ package util
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -46,6 +47,7 @@ func LoadConfig() ApplicationConfig {
 	var conf ApplicationConfig
 	configPath := configDirectory + "conf.json"
 	parseConfig(configPath, &conf)
+	log.Debugf("Config file loaded: %s", configPath)
 	return conf
 }
 

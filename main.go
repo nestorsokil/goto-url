@@ -15,6 +15,7 @@ import (
 
 func main() {
 	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
+	log.SetLevel(log.DebugLevel)
 	conf := util.LoadConfig()
 	requestLog := conf.GetRequestLogFile()
 	defer requestLog.Sync()
@@ -32,10 +33,13 @@ func main() {
 	urlService := service.New(ds, &conf)
 	go urlService.ClearRecordsAsync(stop)
 
-	fs := http.FileServer(http.Dir(conf.GetWebStaticDir()))
+	staticContent := conf.GetWebStaticDir()
+	fs := http.FileServer(http.Dir(staticContent))
 	router := mux.NewRouter()
 	router.PathPrefix("/home/").Handler(http.StripPrefix("/home/", fs))
 	router.Handle("/", rest.RedirectToIndex()).Methods("GET")
+	log.Debugf("Registered static directory: %s", staticContent)
+
 	router.Handle("/{key}", rest.Redirect(urlService)).Methods("GET")
 	router.Handle("/url/short", rest.Shorten(urlService)).Methods("GET")
 	withLog := handlers.LoggingHandler(requestLog, router)

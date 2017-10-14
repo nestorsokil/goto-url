@@ -1,19 +1,21 @@
 package rest
 
 import (
-	"net/http"
 	"fmt"
 	"io"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/nestorsokil/goto-url/service"
 )
 
+// Shorten returns an http handler for URL shorening
 func Shorten(service service.UrlService) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 		queryParams := request.URL.Query()
 		record, err := service.GetRecord(
 			service.RequestBuilder().
-				ForUrl(queryParams.Get("url")).
+				ForURL(queryParams.Get("url")).
 				WithCustomKey(queryParams.Get("customKey")).
 				WithCustomExpirationTime(queryParams.Get("customExpire")).
 				Build())
@@ -22,11 +24,12 @@ func Shorten(service service.UrlService) http.HandlerFunc {
 				fmt.Sprintf("Could not shorten URL. Error: %v", err))
 			return
 		}
-		responseUrl := service.ConstructUrl(request.URL.Host, record.Key)
-		io.WriteString(response, responseUrl)
+		responseURL := service.ConstructURL(request.URL.Host, record.Key)
+		io.WriteString(response, responseURL)
 	}
 }
 
+// Redirect returns an http handler that redirects to full URL
 func Redirect(service service.UrlService) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 		key := mux.Vars(request)["key"]
@@ -43,6 +46,7 @@ func Redirect(service service.UrlService) http.HandlerFunc {
 	}
 }
 
+// RedirectToIndex returns an http handler taht sends user to landing page
 func RedirectToIndex() http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 		http.Redirect(response, request, "home/", http.StatusMovedPermanently)
