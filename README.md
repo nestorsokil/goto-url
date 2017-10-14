@@ -5,6 +5,9 @@ The application can store its data in MongoDb, Redis and in memory (for testing 
 The records are expirable and the expiration time is updated with each access.
 
 Simply use `go build` to get a binary.
-Otherwise you can run `make` in the project root and it will build and start a small Docker image.
+Otherwise you can run `make` in the project root with such tasks:
+ - `make run` : build go binary and run
+ - `make docker-build` : build a Docker image tagged as `goto-url`
+ - `make docker-run` : build an image and run it in current terminal window
 
 Feel free to use this repo in any way you need to.

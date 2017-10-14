@@ -15,14 +15,14 @@ var subject = New(ds, conf)
 
 func TestUrlService_GetRecord(t *testing.T) {
 	testUrl := "http://url.com"
-	record, _ := subject.GetRecord(subject.RequestBuilder().ForUrl(testUrl).Build())
+	record, _ := subject.GetRecord(subject.RequestBuilder().ForURL(testUrl).Build())
 	key, url := record.Key, record.URL
 
 	if url != testUrl {
 		t.Errorf("Expected: %s, actual: %s", url, testUrl)
 	}
 
-	record, _ = subject.GetRecord(subject.RequestBuilder().ForUrl(testUrl).Build())
+	record, _ = subject.GetRecord(subject.RequestBuilder().ForURL(testUrl).Build())
 	key2, url2 := record.Key, record.URL
 
 	if key != key2 {
@@ -38,7 +38,7 @@ func TestUrlService_GetRecord_WithCustomKey(t *testing.T) {
 	customKey := "bla/bla/bla"
 	record, err := subject.GetRecord(
 		subject.RequestBuilder().
-			ForUrl(testUrl).
+			ForURL(testUrl).
 			WithCustomKey(customKey).
 			Build())
 	if err != nil {
@@ -51,7 +51,7 @@ func TestUrlService_GetRecord_WithCustomKey(t *testing.T) {
 
 	record, err = subject.GetRecord(
 		subject.RequestBuilder().
-			ForUrl(testUrl).
+			ForURL(testUrl).
 			WithCustomKey(customKey).
 			Build())
 	if err == nil {
@@ -61,7 +61,7 @@ func TestUrlService_GetRecord_WithCustomKey(t *testing.T) {
 
 func TestService_FindByKey(t *testing.T) {
 	testUrl := "http://url.com"
-	record, err := subject.GetRecord(subject.RequestBuilder().ForUrl(testUrl).Build())
+	record, err := subject.GetRecord(subject.RequestBuilder().ForURL(testUrl).Build())
 	if err != nil {
 		t.Error(err)
 	}
@@ -88,7 +88,7 @@ func TestService_FindByKey(t *testing.T) {
 func TestUrlService_ClearRecordsAsync(t *testing.T) {
 	subject.conf.ExpirationTimeHours = 0
 	record, _ := subject.GetRecord(
-		subject.RequestBuilder().ForUrl("http://url.com").Build())
+		subject.RequestBuilder().ForURL("http://url.com").Build())
 	shouldBeOk, err := subject.FindByKey(record.Key)
 	if err != nil {
 		t.Error(err.Error())
