@@ -46,7 +46,6 @@ func (s *UrlService) GetRecord(request Request) (*db.Record, error) {
 		log.Error(err.Error())
 		return nil, err
 	}
-	log.Debugf("Registered record with key '%s' for URL '%s'", result.Key, result.URL)
 	return result, nil
 }
 
@@ -79,6 +78,7 @@ func (s *UrlService) createWithCustomKey(customKey, url string, expireIn int64) 
 func (s *UrlService) createWithRandKey(url string, expireIn int64) (*db.Record, error) {
 	record, err := s.dataSource.FindShort(url)
 	if record != nil {
+		log.Debugf("URL '%s' already saved, responding with existing record", url)
 		return record, nil
 	}
 	key, err := s.createKey()
@@ -95,6 +95,7 @@ func (s *UrlService) createRecord(key, url string, expireIn int64, mustExpire bo
 	if err != nil {
 		return nil, err
 	}
+	log.Debugf("Registered record with key '%s' for URL '%s'", key, url)
 	return rec, nil
 }
 

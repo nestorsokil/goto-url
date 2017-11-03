@@ -13,7 +13,7 @@ type Request struct {
 	customKey string
 }
 
-// RequestBuilder is a convinient builder that can be used to set params on a request
+// RequestBuilder is a convenient builder that can be used to set params on a request
 type RequestBuilder struct {
 	request Request
 }
