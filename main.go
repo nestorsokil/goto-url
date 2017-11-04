@@ -21,7 +21,7 @@ func main() {
 	defer requestLog.Sync()
 	defer requestLog.Close()
 
-	ds, err := db.CreateDataSource(&conf)
+	ds, err := db.CreateDataSource(util.GetDataSourceType())
 	if err != nil {
 		log.Fatal(err.Error())
 	}

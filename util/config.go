@@ -21,7 +21,6 @@ type ApplicationConfig struct {
 	Port                string `json:"port"`
 	KeyLength           int    `json:"key_length"`
 	DevMode             bool   `json:"dev_mode"`
-	Database            string `json:"database"`
 	ApplicationUrl      string `json:"application_url"`
 	ExpirationTimeHours int64  `json:"expiration_time_hours"`
 	ClearTimeSeconds    int64  `json:"clear_time_seconds"`
@@ -37,6 +36,14 @@ type MongoConfig struct {
 
 type RedisConfig struct {
 	RedisUrl string `json:"redis_url"`
+}
+
+func GetDataSourceType() string {
+	ds := os.Getenv("DATASOURCE_TYPE")
+	if ds != "" {
+		return ds
+	}
+	return IN_MEMORY
 }
 
 func LoadConfig() ApplicationConfig {

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
 	"github.com/gorilla/mux"
 	"github.com/nestorsokil/goto-url/service"
+	log "github.com/sirupsen/logrus"
 )
 
 // Shorten returns an http handler for URL shorening
@@ -42,6 +42,7 @@ func Redirect(service service.UrlService) http.HandlerFunc {
 			respond(response, http.StatusNotFound, err.Error())
 			return
 		}
+		log.Debugf("Request for key '%s', redirecting to '%s'", record.Key, record.URL)
 		http.Redirect(response, request, record.URL, http.StatusMovedPermanently)
 	}
 }

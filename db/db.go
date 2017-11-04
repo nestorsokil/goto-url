@@ -24,9 +24,8 @@ type Record struct {
 	MustExpire bool
 }
 
-func CreateDataSource(config *util.ApplicationConfig) (DataSource, error) {
-	dsType := config.Database
-	switch dsType {
+func CreateDataSource(datasource string) (DataSource, error) {
+	switch datasource {
 	case util.IN_MEMORY:
 		return NewMockDS()
 	case util.MONGO:
@@ -36,7 +35,7 @@ func CreateDataSource(config *util.ApplicationConfig) (DataSource, error) {
 		redisConfig := util.LoadRedisConfig()
 		return NewRedisDs(&redisConfig)
 	default:
-		e := fmt.Sprintf("Unrecognized db option: %s", dsType)
+		e := fmt.Sprintf("Unrecognized db option: %s", datasource)
 		return nil, errors.New(e)
 	}
 }

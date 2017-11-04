@@ -19,3 +19,6 @@ docker-run: docker-build
 	-e GO_TO_URL_CONFIG='/app/config/' \
 	-e GO_TO_URL_STATIC='/app/web/' \
 	goto-url
+
+build-compose: docker-build
+	sudo docker-compose up --no-build
