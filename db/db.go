@@ -3,39 +3,45 @@ package db
 import (
 	"errors"
 	"fmt"
-	"github.com/nestorsokil/goto-url/util"
+	"github.com/fzzy/radix/redis"
+	"github.com/nestorsokil/goto-url/conf"
 )
 
-type DataSource interface {
+type DataStorage interface {
 	Find(key string) (*Record, error)
-	FindShort(url string) (*Record, error)
-	Save(*Record) error
-	ExistsKey(key string) (bool, error)
-	DeleteAllExpiredBefore(time int64) (removed int, err error)
-	Update(*Record) error
+	SaveWithExpiration(record *Record, expireIn int64) error
+	Exists(key string) (bool, error)
 
 	Shutdown()
 }
 
 type Record struct {
-	Key        string
-	URL        string
-	Expiration int64
-	MustExpire bool
+	Key string
+	URL string
 }
 
-func CreateDataSource(datasource string) (DataSource, error) {
-	switch datasource {
-	case util.IN_MEMORY:
-		return NewMockDS()
-	case util.MONGO:
-		mongoConfig := util.LoadMongoConfig()
-		return NewMongoDS(&mongoConfig)
-	case util.REDIS:
-		redisConfig := util.LoadRedisConfig()
-		return NewRedisDs(&redisConfig)
+func CreateStorage(c conf.Config) (DataStorage, error) {
+	storage := c.GetString(conf.ENV_STORAGE)
+	switch storage {
+	case conf.IN_MEMORY:
+		return newMockDS()
+	case conf.REDIS:
+		return newRedis(c.GetString(conf.ENV_REDIS_URL))
 	default:
-		e := fmt.Sprintf("Unrecognized db option: %s", datasource)
+		e := fmt.Sprintf("Unrecognized db option: %s", storage)
 		return nil, errors.New(e)
 	}
+}
+
+func newMockDS() (DataStorage, error) {
+	return &mockDataSource{records: make(map[string]*Record)}, nil
+}
+
+func newRedis(address string) (DataStorage, error) {
+	conn, err := redis.Dial("tcp", address)
+	if err != nil {
+		e := fmt.Sprintf("Error creating Redis connection: %v", err)
+		return nil, errors.New(e)
+	}
+	return &redisdb{conn}, nil
 }

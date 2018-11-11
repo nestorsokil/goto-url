@@ -1,9 +1,0 @@
-{
-  "log_dir" : "log/",
-  "port" : ":8080",
-  "dev_mode" : true,
-  "application_url" : "http://localhost:8080",
-  "key_length" : 5,
-  "expiration_time_hours" : 72,
-  "clear_time_seconds" : 5
-}

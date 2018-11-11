@@ -2,26 +2,20 @@ package rest
 
 import (
 	"fmt"
-	"io"
-	"net/http"
 	"github.com/gorilla/mux"
 	"github.com/nestorsokil/goto-url/service"
 	log "github.com/sirupsen/logrus"
+	"io"
+	"net/http"
 )
 
-// Shorten returns an http handler for URL shorening
+// Shorten returns an http handler for URL shortening
 func Shorten(service service.UrlService) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 		queryParams := request.URL.Query()
-		record, err := service.GetRecord(
-			service.RequestBuilder().
-				ForURL(queryParams.Get("url")).
-				WithCustomKey(queryParams.Get("customKey")).
-				WithCustomExpirationTime(queryParams.Get("customExpire")).
-				Build())
+		record, err := service.GetRecord(queryParams.Get("url"), queryParams.Get("customKey"))
 		if err != nil {
-			respond(response, http.StatusInternalServerError,
-				fmt.Sprintf("Could not shorten URL. Error: %v", err))
+			respond(response, http.StatusInternalServerError, fmt.Sprintf("Could not shorten. Error: %v", err))
 			return
 		}
 		responseURL := service.ConstructURL(request.URL.Host, record.Key)
@@ -44,13 +38,6 @@ func Redirect(service service.UrlService) http.HandlerFunc {
 		}
 		log.Debugf("Request for key '%s', redirecting to '%s'", record.Key, record.URL)
 		http.Redirect(response, request, record.URL, http.StatusMovedPermanently)
-	}
-}
-
-// RedirectToIndex returns an http handler taht sends user to landing page
-func RedirectToIndex() http.HandlerFunc {
-	return func(response http.ResponseWriter, request *http.Request) {
-		http.Redirect(response, request, "home/", http.StatusMovedPermanently)
 	}
 }
 
