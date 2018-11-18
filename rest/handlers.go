@@ -13,7 +13,8 @@ import (
 func Shorten(service service.UrlService) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 		queryParams := request.URL.Query()
-		record, err := service.GetRecord(queryParams.Get("url"), queryParams.Get("customKey"))
+		log.Debugf("Request to shorten URL '%v' from IP '%v'", queryParams.Get("url"), request.RemoteAddr)
+		record, err := service.CreateRecord(queryParams.Get("url"), queryParams.Get("customKey"))
 		if err != nil {
 			respond(response, http.StatusInternalServerError, fmt.Sprintf("Could not shorten. Error: %v", err))
 			return
@@ -27,12 +28,15 @@ func Shorten(service service.UrlService) http.HandlerFunc {
 func Redirect(service service.UrlService) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 		key := mux.Vars(request)["key"]
+		log.Debugf("Request for key '%s' received from IP '%v'", key, request.RemoteAddr)
 		if key == "" {
+			log.Warnf("No key in the request")
 			respond(response, http.StatusBadRequest, "No key provided.")
 			return
 		}
 		record, err := service.FindByKey(key)
 		if err != nil {
+			log.Warnf("Key '%v' was not found", key)
 			respond(response, http.StatusNotFound, err.Error())
 			return
 		}

@@ -6,6 +6,7 @@ import (
 	"github.com/nestorsokil/goto-url/conf"
 	"github.com/nestorsokil/goto-url/db"
 	log "github.com/sirupsen/logrus"
+	"regexp"
 )
 
 type UrlService struct {
@@ -14,8 +15,10 @@ type UrlService struct {
 	expiration int64
 }
 
-// ErrNotFound is an error returned in case no suitable records were found
 var ErrNotFound = errors.New("record not found")
+var ErrNotUrl = errors.New("not valid URL")
+
+var urlRegex = regexp.MustCompile("(https://|http://)?(?:([\\w-]+)\\.)?([\\w-]+)\\.(\\w+)")
 
 // New returns a new UrlService
 func New(dataSource db.DataStorage, c conf.Config) UrlService {
@@ -26,11 +29,15 @@ func New(dataSource db.DataStorage, c conf.Config) UrlService {
 	}
 }
 
-// GetRecord returns a record for the given request if there is one in data source
-// If not - a new record is created
-func (s *UrlService) GetRecord(url, customKey string) (*db.Record, error) {
-	if url == "" {
+// CreateRecord creates a record for the given url and (optional) key pair
+func (s *UrlService) CreateRecord(rawUrl, customKey string) (*db.Record, error) {
+	if rawUrl == "" {
 		return nil, errors.New("no URL provided")
+	}
+	url, ok := sanitizeUrl(rawUrl)
+	if !ok {
+		log.Errorf("The provided string '%v' is not a url", rawUrl)
+		return nil, ErrNotUrl
 	}
 	var result *db.Record
 	var err error
@@ -39,12 +46,23 @@ func (s *UrlService) GetRecord(url, customKey string) (*db.Record, error) {
 	} else {
 		result, err = s.createWithRandKey(url)
 	}
-
 	if err != nil {
-		log.Error(err.Error())
+		log.Errorf("Error saving the record (url = %v, key = %v): %v", url, customKey, err.Error())
 		return nil, err
 	}
+	log.Debugf("Record %v was created successfully", result)
 	return result, nil
+}
+
+func sanitizeUrl(url string) (sanitized string, ok bool) {
+	matches := urlRegex.FindAllStringSubmatch(url, -1)
+	if matches == nil || len(matches) < 1 {
+		return "", false
+	}
+	if matches[0][1] == "" {
+		return "http://" + matches[0][0], true
+	}
+	return matches[0][0], true
 }
 
 // FindByKey returns a record for the provided key
@@ -55,6 +73,7 @@ func (s *UrlService) FindByKey(key string) (*db.Record, error) {
 		return nil, ErrNotFound
 	}
 	if record == nil {
+		log.Errorf("Key '%v' not found", key)
 		return nil, ErrNotFound
 	}
 	s.storage.SaveWithExpiration(record, s.expiration)
@@ -70,6 +89,7 @@ func (s *UrlService) ConstructURL(host, key string) string {
 func (s *UrlService) createWithCustomKey(customKey, url string) (*db.Record, error) {
 	alreadyExists, err := s.storage.Exists(customKey)
 	if err != nil {
+		log.Errorf("Error check the db for key '%v', URL '%v'. Error: %v", customKey, url, err)
 		return nil, err
 	}
 	if alreadyExists {
@@ -81,6 +101,7 @@ func (s *UrlService) createWithCustomKey(customKey, url string) (*db.Record, err
 
 func (s *UrlService) createWithRandKey(url string) (*db.Record, error) {
 	key, err := s.createKey()
+	log.Debugf("Random key '%v' was generated for URL '%v'", key, url)
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +123,11 @@ func (s *UrlService) createKey() (string, error) {
 }
 
 func (s *UrlService) createRecord(key, url string, expireIn int64) (*db.Record, error) {
+	log.Debugf("Creating record (key = %v, URL = %v)", key, url)
 	rec := &db.Record{Key: key, URL: url}
 	err := s.storage.SaveWithExpiration(rec, expireIn)
 	if err != nil {
+		log.Errorf("Could not save record %v. Error: %v", rec, err)
 		return nil, err
 	}
 	log.Debugf("Registered record with key '%s' for URL '%s'", key, url)

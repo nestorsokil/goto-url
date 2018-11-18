@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/fzzy/radix/redis"
 	"github.com/nestorsokil/goto-url/conf"
+	log "github.com/sirupsen/logrus"
 )
 
 type DataStorage interface {
@@ -38,6 +39,7 @@ func newMockDS() (DataStorage, error) {
 }
 
 func newRedis(address string) (DataStorage, error) {
+	log.Infof("Trying to connect to Redis on address '%v'", address)
 	conn, err := redis.Dial("tcp", address)
 	if err != nil {
 		e := fmt.Sprintf("Error creating Redis connection: %v", err)

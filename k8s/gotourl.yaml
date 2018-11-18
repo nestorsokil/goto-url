@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gotourl-service
+  labels:
+    app: gotourl
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+  selector:
+    app: gotourl
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gotourl-config-map
+  namespace: default
+data:
+  ENV_PORT: ":8080"
+  ENV_KEY_LEN: "6"
+  ENV_EXPIRATION_MILLIS: "7200000"
+  ENV_STORAGE: "redis"
+  ENV_REDIS_URL: "redis:6379"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gotourl
+  labels:
+    app: gotourl
+spec:
+  selector:
+    matchLabels:
+      app: gotourl
+  replicas: 1
+  template:
+    metadata:
+      name: gotourl
+      labels:
+        app: gotourl
+    spec:
+      containers:
+      - name: gotourl
+        image: nsokil/gotourl:1.0
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: gotourl-config-map

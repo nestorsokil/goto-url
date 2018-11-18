@@ -15,7 +15,11 @@ func (r *redisdb) Find(key string) (*Record, error) {
 		log.Errorf("Error when looking up record (key = %v)", key)
 		return nil, err
 	}
-	return &Record{Key: hash["key"], URL: hash["URL"]}, nil
+	if len(hash) == 0 {
+		return nil, nil
+	}
+
+	return &Record{Key: key, URL: hash["URL"]}, nil
 }
 
 func (r *redisdb) SaveWithExpiration(rec *Record, expireIn int64) error {

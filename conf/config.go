@@ -6,7 +6,6 @@ import (
 )
 
 const (
-	ENV_LOG_DIR           = "ENV_LOG_DIR"
 	ENV_PORT              = "ENV_PORT"
 	ENV_KEY_LEN           = "ENV_KEY_LEN"
 	ENV_EXPIRATION_MILLIS = "ENV_EXPIRATION_MILLIS"

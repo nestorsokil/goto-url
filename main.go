@@ -1,10 +1,9 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/nestorsokil/goto-url/conf"
 	"net/http"
-
-	"github.com/gorilla/mux"
 
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/rest"
@@ -29,5 +28,5 @@ func main() {
 
 	port := c.GetString(conf.ENV_PORT)
 	log.Infof("Starting server on %v.", port)
-	http.ListenAndServe(port, router)
+	log.Error(http.ListenAndServe(port, router))
 }
