@@ -60,7 +60,13 @@ spec:
       - name: redis
         image: redis:5.0.1
         imagePullPolicy: Always
-        args: ["--appendonly", "yes", "--save", "900", "1", "--save", "30", "2"]
+        env:
+        - name: REDIS_PASS
+          valueFrom:
+            secretKeyRef:
+              name: redis-secrets
+              key: REDIS_PASS
+        args: ["--requirepass $(REDIS_PASS)", "--appendonly", "yes", "--save", "900", "1", "--save", "30", "2"]
         ports:
         - containerPort: 6379
           name: redis

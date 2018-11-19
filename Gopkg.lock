@@ -2,15 +2,21 @@
 
 
 [[projects]]
-  branch = "master"
-  digest = "1:e70949c399365863e37c5acca66664f43dda11e06fa3321facf717f5173fd44f"
-  name = "github.com/fzzy/radix"
+  digest = "1:34a9a60fade37f8009ed4a19e02924198aba3eabfcc120ee5c6002b7de17212d"
+  name = "github.com/go-redis/redis"
   packages = [
-    "redis",
-    "redis/resp",
+    ".",
+    "internal",
+    "internal/consistenthash",
+    "internal/hashtag",
+    "internal/pool",
+    "internal/proto",
+    "internal/singleflight",
+    "internal/util",
   ]
   pruneopts = "UT"
-  revision = "3528e87a910c6730810cec1be187f989d7d9442a"
+  revision = "b3d9bf10f6666b2ee5100a6f3f84f4caf3b4e37d"
+  version = "v6.14.2"
 
 [[projects]]
   digest = "1:c79fb010be38a59d657c48c6ba1d003a8aa651fa56b579d959d74573b7dff8e1"
@@ -55,7 +61,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/fzzy/radix/redis",
+    "github.com/go-redis/redis",
     "github.com/gorilla/mux",
     "github.com/sirupsen/logrus",
   ]

@@ -24,8 +24,8 @@ var urlRegex = regexp.MustCompile("(https://|http://)?(?:([\\w-]+)\\.)?([\\w-]+)
 func New(dataSource db.DataStorage, c conf.Config) UrlService {
 	return UrlService{
 		storage:    dataSource,
-		keyLen:     c.GetInt(conf.ENV_KEY_LEN),
-		expiration: int64(c.GetInt(conf.ENV_EXPIRATION_MILLIS)),
+		keyLen:     c.GetInt(conf.EnvKeyLen),
+		expiration: int64(c.GetInt(conf.EnvExpirationMillis)),
 	}
 }
 

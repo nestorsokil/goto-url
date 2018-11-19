@@ -6,11 +6,12 @@ import (
 )
 
 const (
-	ENV_PORT              = "ENV_PORT"
-	ENV_KEY_LEN           = "ENV_KEY_LEN"
-	ENV_EXPIRATION_MILLIS = "ENV_EXPIRATION_MILLIS"
-	ENV_STORAGE           = "ENV_STORAGE"
-	ENV_REDIS_URL         = "ENV_REDIS_URL"
+	EnvPort             = "ENV_PORT"
+	EnvKeyLen           = "ENV_KEY_LEN"
+	EnvExpirationMillis = "ENV_EXPIRATION_MILLIS"
+	EnvStorage          = "ENV_STORAGE"
+	EnvRedisUrl         = "ENV_REDIS_URL"
+	EnvRedisPass        = "ENV_REDIS_PASS"
 )
 
 const (

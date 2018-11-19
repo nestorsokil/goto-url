@@ -26,7 +26,7 @@ func main() {
 	router.Handle("/{key}", rest.Redirect(urlService)).Methods("GET")
 	router.Handle("/url/short", rest.Shorten(urlService)).Methods("GET")
 
-	port := c.GetString(conf.ENV_PORT)
+	port := c.GetString(conf.EnvPort)
 	log.Infof("Starting server on %v.", port)
 	log.Error(http.ListenAndServe(port, router))
 }

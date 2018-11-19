@@ -16,7 +16,7 @@ Plan (unordered)
  - [x] deploying single node Redis as a StatefulSet
  - [x] configure application Deployment
  - [x] configure PVC to persist Redis oplog and backups
- - [ ] configure redis auth with Secrets
+ - [x] configure redis auth with Secrets
  - [ ] deploy persistent ELK and elastic/filebeat as DeamonSet
  - [ ] deploy Prometheus to monitor metrics
  - [ ] add Envoy ingress or Istio

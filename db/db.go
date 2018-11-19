@@ -3,7 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
-	"github.com/fzzy/radix/redis"
+	"github.com/go-redis/redis"
 	"github.com/nestorsokil/goto-url/conf"
 	log "github.com/sirupsen/logrus"
 )
@@ -22,12 +22,12 @@ type Record struct {
 }
 
 func CreateStorage(c conf.Config) (DataStorage, error) {
-	storage := c.GetString(conf.ENV_STORAGE)
+	storage := c.GetString(conf.EnvStorage)
 	switch storage {
 	case conf.IN_MEMORY:
 		return newMockDS()
 	case conf.REDIS:
-		return newRedis(c.GetString(conf.ENV_REDIS_URL))
+		return newRedis(c)
 	default:
 		e := fmt.Sprintf("Unrecognized db option: %s", storage)
 		return nil, errors.New(e)
@@ -38,12 +38,17 @@ func newMockDS() (DataStorage, error) {
 	return &mockDataSource{records: make(map[string]*Record)}, nil
 }
 
-func newRedis(address string) (DataStorage, error) {
+func newRedis(c conf.Config) (DataStorage, error) {
+	address, password := c.GetString(conf.EnvRedisUrl), c.GetString(conf.EnvRedisPass)
 	log.Infof("Trying to connect to Redis on address '%v'", address)
-	conn, err := redis.Dial("tcp", address)
+	cli := redis.NewClient(&redis.Options{
+		Addr:     address,
+		Password: password,
+	})
+	pong, err := cli.Ping().Result()
 	if err != nil {
-		e := fmt.Sprintf("Error creating Redis connection: %v", err)
-		return nil, errors.New(e)
+		log.Errorf("Could not create Redis client (response = %v, error = %v)", pong, err)
+		return nil, errors.New("connection error")
 	}
-	return &redisdb{conn}, nil
+	return &redisdb{cli}, nil
 }

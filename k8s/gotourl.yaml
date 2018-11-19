@@ -10,6 +10,7 @@ spec:
   - port: 8080
   selector:
     app: gotourl
+
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -22,6 +23,7 @@ data:
   ENV_EXPIRATION_MILLIS: "7200000"
   ENV_STORAGE: "redis"
   ENV_REDIS_URL: "redis:6379"
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -47,3 +49,9 @@ spec:
         envFrom:
           - configMapRef:
               name: gotourl-config-map
+        env:
+        - name: ENV_REDIS_PASS
+          valueFrom:
+            secretKeyRef:
+              name: redis-secrets
+              key: REDIS_PASS
