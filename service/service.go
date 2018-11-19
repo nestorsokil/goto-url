@@ -54,15 +54,15 @@ func (s *UrlService) CreateRecord(rawUrl, customKey string) (*db.Record, error) 
 	return result, nil
 }
 
-func sanitizeUrl(url string) (sanitized string, ok bool) {
+func sanitizeUrl(url string) (sanitized string, isCorrectUrl bool) {
 	matches := urlRegex.FindAllStringSubmatch(url, -1)
 	if matches == nil || len(matches) < 1 {
 		return "", false
 	}
 	if matches[0][1] == "" {
-		return "http://" + matches[0][0], true
+		return "http://" + url, true
 	}
-	return matches[0][0], true
+	return url, true
 }
 
 // FindByKey returns a record for the provided key

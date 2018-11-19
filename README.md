@@ -22,7 +22,7 @@ Plan (unordered)
  - [ ] add Envoy ingress or Istio
  - [ ] deploy Redis Cluster
  - [ ] deploy Consul and configure application to pull configuration
- - [ ] deploy Nginx to serve frontend app
+ - [x] deploy Nginx to serve frontend app
  - [ ] configure TLS for ingress traffic
  - [ ] deploy Jaeger (no reason, just for fun)
  - [ ] integrate a CNI solution e.g. Calico/Weave/Cilium
