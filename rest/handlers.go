@@ -19,7 +19,7 @@ func Shorten(service service.UrlService) http.HandlerFunc {
 			respond(response, http.StatusInternalServerError, fmt.Sprintf("Could not shorten. Error: %v", err))
 			return
 		}
-		responseURL := service.ConstructURL(request.URL.Host, record.Key)
+		responseURL := constructURL(request.URL.Host, record.Key)
 		io.WriteString(response, responseURL)
 	}
 }
@@ -43,6 +43,10 @@ func Redirect(service service.UrlService) http.HandlerFunc {
 		log.Debugf("Request for key '%s', redirecting to '%s'", record.Key, record.URL)
 		http.Redirect(response, request, record.URL, http.StatusMovedPermanently)
 	}
+}
+
+func constructURL(host, key string) string {
+	return host + "/" + key
 }
 
 func respond(response http.ResponseWriter, status int, content string) {

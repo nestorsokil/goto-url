@@ -24,9 +24,9 @@ type Record struct {
 func CreateStorage(c conf.Config) (DataStorage, error) {
 	storage := c.GetString(conf.EnvStorage)
 	switch storage {
-	case conf.IN_MEMORY:
+	case conf.InMemory:
 		return newMockDS()
-	case conf.REDIS:
+	case conf.Redis:
 		return newRedis(c)
 	default:
 		e := fmt.Sprintf("Unrecognized db option: %s", storage)
