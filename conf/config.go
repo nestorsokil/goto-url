@@ -15,8 +15,8 @@ const (
 )
 
 const (
-	IN_MEMORY = "inMemory"
-	REDIS     = "redis"
+	InMemory = "inMemory"
+	Redis    = "redis"
 )
 
 type Config interface {
@@ -33,4 +33,16 @@ func (e *EnvConfig) GetString(key string) string {
 func (e *EnvConfig) GetInt(key string) int {
 	i, _ := strconv.Atoi(os.Getenv(key))
 	return i
+}
+
+type TestConfig struct {
+	Data map[string]interface{}
+}
+
+func (t *TestConfig) GetString(key string) string {
+	return t.Data[key].(string)
+}
+
+func (t *TestConfig) GetInt(key string) int {
+	return t.Data[key].(int)
 }

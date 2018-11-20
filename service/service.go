@@ -34,7 +34,7 @@ func (s *UrlService) CreateRecord(rawUrl, customKey string) (*db.Record, error) 
 	if rawUrl == "" {
 		return nil, errors.New("no URL provided")
 	}
-	url, ok := sanitizeUrl(rawUrl)
+	url, ok := validateUrl(rawUrl)
 	if !ok {
 		log.Errorf("The provided string '%v' is not a url", rawUrl)
 		return nil, ErrNotUrl
@@ -54,7 +54,7 @@ func (s *UrlService) CreateRecord(rawUrl, customKey string) (*db.Record, error) 
 	return result, nil
 }
 
-func sanitizeUrl(url string) (sanitized string, isCorrectUrl bool) {
+func validateUrl(url string) (validated string, isCorrectUrl bool) {
 	matches := urlRegex.FindAllStringSubmatch(url, -1)
 	if matches == nil || len(matches) < 1 {
 		return "", false
@@ -76,14 +76,11 @@ func (s *UrlService) FindByKey(key string) (*db.Record, error) {
 		log.Errorf("Key '%v' not found", key)
 		return nil, ErrNotFound
 	}
-	s.storage.SaveWithExpiration(record, s.expiration)
+	if err = s.storage.SaveWithExpiration(record, s.expiration); err != nil {
+		log.Warnf("Could not refresh record (key = %s)", key)
+	}
 	log.Debugf("Record for URL '%s' requested.", record.URL)
 	return record, nil
-}
-
-// ConstructURL creates a valid short URL
-func (s *UrlService) ConstructURL(host, key string) string {
-	return host + "/" + key
 }
 
 func (s *UrlService) createWithCustomKey(customKey, url string) (*db.Record, error) {
