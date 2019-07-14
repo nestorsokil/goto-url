@@ -8,6 +8,8 @@ import (
 	"github.com/nestorsokil/goto-url/db"
 	"github.com/nestorsokil/goto-url/rest"
 	"github.com/nestorsokil/goto-url/service"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,6 +26,9 @@ func main() {
 	defer ds.Shutdown()
 	urlService := service.New(ds, c)
 	router := mux.NewRouter()
+
+	router.Handle("/metrics", promhttp.Handler())
+
 	router.Handle("/{key}", rest.Redirect(urlService)).Methods("GET")
 	router.Handle("/url/short", rest.Shorten(urlService)).Methods("GET")
 
