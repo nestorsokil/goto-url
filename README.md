@@ -11,20 +11,24 @@ Run
 
 - `docker build -t gotourl:latest . && docker run --name gotourl-instance gotourl:latest` to build an image.
 
-Plan (unordered)
+### K8S Plan (unordered)
 
  - [x] deploying single node Redis as a StatefulSet
  - [x] configure application Deployment
  - [x] configure PVC to persist Redis oplog and backups
- - [x] configure redis auth with Secrets
- - [ ] deploy persistent ELK and elastic/filebeat as DeamonSet
+ - [x] configure Redis Auth with Secrets
+ - [x] deploy persistent ELK and elastic/filebeat as DeamonSet
  - [ ] deploy Prometheus to monitor metrics
  - [ ] add Envoy ingress or Istio
- - [ ] deploy Redis Cluster
  - [ ] deploy Consul and configure application to pull configuration
  - [x] deploy Nginx to serve frontend app
  - [ ] configure TLS for ingress traffic
  - [ ] deploy Jaeger (no reason, just for fun)
  - [ ] integrate a CNI solution e.g. Calico/Weave/Cilium
+ 
+
+##### Secondary
+ - [ ] configure Filebeat to parse logrus format and log levels correctly
+ - [ ] deploy Redis in Cluster mode (shards)
 
 Feel free to use this repo in any way you need to.

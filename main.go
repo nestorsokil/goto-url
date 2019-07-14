@@ -19,6 +19,7 @@ func main() {
 	ds, err := db.CreateStorage(c)
 	if err != nil {
 		log.Fatal(err.Error())
+		return
 	}
 	defer ds.Shutdown()
 	urlService := service.New(ds, c)

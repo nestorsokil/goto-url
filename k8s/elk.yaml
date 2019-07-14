@@ -1,0 +1,178 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: es-config
+data:
+  elasticsearch.yml: |
+    cluster.name: elasticsearch-cluster
+    network.host: "0.0.0.0"
+    bootstrap.memory_lock: false
+    discovery.type: single-node
+    discovery.zen.ping.unicast.hosts: elasticsearch-cluster
+    discovery.zen.minimum_master_nodes: 1
+    xpack.security.enabled: false
+    xpack.monitoring.enabled: false
+  ES_JAVA_OPTS: -Xms512m -Xmx512m
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch-pv
+  labels:
+    type: local
+spec:
+  storageClassName: "manual"
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/usr/share/elasticsearch/data"
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-pv-claim
+spec:
+  storageClassName: "manual"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+spec:
+  selector:
+    app: elasticsearch-node
+  ports:
+    - name: transport
+      port: 9300
+    - name: http
+      port: 9200
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch-node
+spec:
+  selector:
+    matchLabels:
+      app: elasticsearch-node
+  serviceName: elasticsearch-node
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: elasticsearch-node
+    spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        - name: chown-data-dir
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          command: ["chown", "-v", "-R", "1000:1000", "/usr/share/elasticsearch/data"]
+          volumeMounts:
+            - name: data-volume
+              mountPath: /usr/share/elasticsearch/data
+      containers:
+        - name: elasticsearch
+          resources:
+            requests:
+              memory: 1Gi
+          securityContext:
+            privileged: true
+            runAsUser: 1000
+            capabilities:
+              add:
+                - IPC_LOCK
+                - SYS_RESOURCE
+          image: docker.elastic.co/elasticsearch/elasticsearch:6.5.1
+          env:
+            - name: ES_JAVA_OPTS
+              valueFrom:
+                configMapKeyRef:
+                  name: es-config
+                  key: ES_JAVA_OPTS
+          ports:
+            - containerPort: 9200
+              name: es-http
+            - containerPort: 9300
+              name: es-transport
+          volumeMounts:
+            - name: data-volume
+              mountPath: /usr/share/elasticsearch/data
+            - name: elasticsearch-config
+              mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+              subPath: elasticsearch.yml
+      volumes:
+        - name: elasticsearch-config
+          configMap:
+            name: es-config
+            items:
+              - key: elasticsearch.yml
+                path: elasticsearch.yml
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: elasticsearch-pv-claim
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-service
+  labels:
+    app: kibana
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 5601
+  selector:
+    app: kibana
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: kibana
+      labels:
+        app: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: docker.elastic.co/kibana/kibana:6.5.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5601
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: http://elasticsearch:9200
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: kibana
