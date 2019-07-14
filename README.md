@@ -5,11 +5,7 @@ The application can store its data in Redis and in memory (for testing purposes 
 
 The purpose is learning to deploy a near-prod-grade k8s cluster along with modern tools.
 
-Run 
-
-- `go build` to build a binary
-
-- `docker build -t gotourl:latest . && docker run --name gotourl-instance gotourl:latest` to build an image.
+See Makefile for deploy options
 
 ### K8S Plan (unordered)
 
