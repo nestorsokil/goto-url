@@ -76,7 +76,9 @@ func (s *UrlService) FindByKey(key string) (*db.Record, error) {
 		log.Errorf("Key '%v' not found", key)
 		return nil, ErrNotFound
 	}
-	s.storage.SaveWithExpiration(record, s.expiration)
+	if err = s.storage.SaveWithExpiration(record, s.expiration); err != nil {
+		log.Warnf("Could not refresh record (key = %s)", key)
+	}
 	log.Debugf("Record for URL '%s' requested.", record.URL)
 	return record, nil
 }
