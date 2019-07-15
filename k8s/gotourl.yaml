@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
       - name: gotourl
-        image: nsokil/gotourl:1.0
+        image: nsokil/gotourl:latest
         imagePullPolicy: Always
         envFrom:
           - configMapRef:
