@@ -13,14 +13,15 @@ import (
 func Shorten(service service.UrlService) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 		queryParams := request.URL.Query()
-		log.Debugf("Request to shorten URL '%v' from IP '%v'", queryParams.Get("url"), request.RemoteAddr)
-		record, err := service.CreateRecord(queryParams.Get("url"), queryParams.Get("customKey"))
+		url := queryParams.Get("url")
+		log.Debugf("Request to shorten URL '%v' from IP '%v'", url, request.RemoteAddr)
+		record, err := service.CreateRecord(request.Context(), url, queryParams.Get("customKey"))
 		if err != nil {
-			respond(response, http.StatusInternalServerError, fmt.Sprintf("Could not shorten. Error: %v", err))
+			respond(request, response, http.StatusInternalServerError, fmt.Sprintf("Could not shorten. Error: %v", err))
 			return
 		}
 		responseURL := constructURL(request.URL.Host, record.Key)
-		io.WriteString(response, responseURL)
+		respond(request, response, http.StatusCreated, responseURL)
 	}
 }
 
@@ -31,13 +32,13 @@ func Redirect(service service.UrlService) http.HandlerFunc {
 		log.Debugf("Request for key '%s' received from IP '%v'", key, request.RemoteAddr)
 		if key == "" {
 			log.Warnf("No key in the request")
-			respond(response, http.StatusBadRequest, "No key provided.")
+			respond(request, response, http.StatusBadRequest, "No key provided.")
 			return
 		}
-		record, err := service.FindByKey(key)
+		record, err := service.FindByKey(request.Context(), key)
 		if err != nil {
 			log.Warnf("Key '%v' was not found", key)
-			respond(response, http.StatusNotFound, err.Error())
+			respond(request, response, http.StatusNotFound, err.Error())
 			return
 		}
 		log.Debugf("Request for key '%s', redirecting to '%s'", record.Key, record.URL)
@@ -49,8 +50,10 @@ func constructURL(host, key string) string {
 	return host + "/" + key
 }
 
-func respond(response http.ResponseWriter, status int, content string) {
-	response.WriteHeader(status)
-	response.Header().Set("Content-Type", "text/plain")
-	io.WriteString(response, content)
+func respond(req *http.Request, res http.ResponseWriter, status int, content string) {
+	res.WriteHeader(status)
+	res.Header().Set("Content-Type", "text/plain")
+	if _, err := io.WriteString(res, content); err != nil {
+		log.Errorf("Could not write response to IP %v. Error: %v", req.RemoteAddr, err.Error())
+	}
 }

@@ -15,10 +15,10 @@ See Makefile for deploy options
  - [x] configure Redis Auth with Secrets
  - [x] deploy persistent ELK and elastic/filebeat as DaemonSet
  - [x] deploy Prometheus with Grafana to monitor metrics
- - [ ] add Envoy ingress or Istio
  - [x] deploy Nginx to serve frontend app
- - [ ] deploy Jaeger (no reason, just for fun)
- - [ ] integrate a CNI solution e.g. Calico/Weave/Cilium
+ - [x] deploy Jaeger (all-in-one with direct node-to-collector http because I'm lazy)
+ - [ ] integrate a CNI solution e.g. Calico/Weave
+ - [ ] convert manifests to Helm charts 
  
 
 ##### Secondary

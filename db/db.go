@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
@@ -9,11 +10,11 @@ import (
 )
 
 type DataStorage interface {
-	Find(key string) (*Record, error)
-	SaveWithExpiration(record *Record, expireIn int64) error
-	Exists(key string) (bool, error)
+	Find(ctx context.Context, key string) (*Record, error)
+	SaveWithExpiration(ctx context.Context, record *Record, expireIn int64) error
+	Exists(ctx context.Context, key string) (bool, error)
 
-	Shutdown()
+	Shutdown(ctx context.Context)
 }
 
 type Record struct {
@@ -22,20 +23,32 @@ type Record struct {
 }
 
 func CreateStorage(c conf.Config) (DataStorage, error) {
+	var (
+		dataStorage DataStorage
+		err         error
+	)
 	storage := c.GetString(conf.EnvStorage)
 	switch storage {
 	case conf.InMemory:
-		return newMockDS()
+		dataStorage = newMockDS()
 	case conf.Redis:
-		return newRedis(c)
+		dataStorage, err = newRedis(c)
+		if err != nil {
+			return nil, err
+		}
 	default:
 		e := fmt.Sprintf("Unrecognized db option: %s", storage)
 		return nil, errors.New(e)
 	}
+
+	if c.GetString(conf.EnvTraceDbEnabled) == "true" {
+		return &TraceDb{actual: dataStorage}, nil
+	}
+	return dataStorage, nil
 }
 
-func newMockDS() (DataStorage, error) {
-	return &mockDataSource{records: make(map[string]*Record)}, nil
+func newMockDS() DataStorage {
+	return &mockDataSource{records: make(map[string]*Record)}
 }
 
 func newRedis(c conf.Config) (DataStorage, error) {

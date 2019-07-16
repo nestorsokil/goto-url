@@ -10,6 +10,7 @@ const (
 	EnvKeyLen           = "ENV_KEY_LEN"
 	EnvExpirationMillis = "ENV_EXPIRATION_MILLIS"
 	EnvStorage          = "ENV_STORAGE"
+	EnvTraceDbEnabled   = "ENV_TRACE_DB_ENABLED"
 	EnvRedisUrl         = "ENV_REDIS_URL"
 	EnvRedisPass        = "ENV_REDIS_PASS"
 )

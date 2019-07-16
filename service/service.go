@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/nestorsokil/goto-url/conf"
@@ -30,7 +31,7 @@ func New(dataSource db.DataStorage, c conf.Config) UrlService {
 }
 
 // CreateRecord creates a record for the given url and (optional) key pair
-func (s *UrlService) CreateRecord(rawUrl, customKey string) (*db.Record, error) {
+func (s *UrlService) CreateRecord(ctx context.Context, rawUrl, customKey string) (*db.Record, error) {
 	if rawUrl == "" {
 		return nil, errors.New("no URL provided")
 	}
@@ -42,9 +43,9 @@ func (s *UrlService) CreateRecord(rawUrl, customKey string) (*db.Record, error) 
 	var result *db.Record
 	var err error
 	if customKey != "" {
-		result, err = s.createWithCustomKey(customKey, url)
+		result, err = s.createWithCustomKey(ctx, customKey, url)
 	} else {
-		result, err = s.createWithRandKey(url)
+		result, err = s.createWithRandKey(ctx, url)
 	}
 	if err != nil {
 		log.Errorf("Error saving the record (url = %v, key = %v): %v", url, customKey, err.Error())
@@ -66,8 +67,8 @@ func validateUrl(url string) (validated string, isCorrectUrl bool) {
 }
 
 // FindByKey returns a record for the provided key
-func (s *UrlService) FindByKey(key string) (*db.Record, error) {
-	record, err := s.storage.Find(key)
+func (s *UrlService) FindByKey(ctx context.Context, key string) (*db.Record, error) {
+	record, err := s.storage.Find(ctx, key)
 	if err != nil {
 		log.Errorf("FindByKey(%s) : %v", key, err)
 		return nil, ErrNotFound
@@ -76,15 +77,15 @@ func (s *UrlService) FindByKey(key string) (*db.Record, error) {
 		log.Errorf("Key '%v' not found", key)
 		return nil, ErrNotFound
 	}
-	if err = s.storage.SaveWithExpiration(record, s.expiration); err != nil {
+	if err = s.storage.SaveWithExpiration(ctx, record, s.expiration); err != nil {
 		log.Warnf("Could not refresh record (key = %s)", key)
 	}
 	log.Debugf("Record for URL '%s' requested.", record.URL)
 	return record, nil
 }
 
-func (s *UrlService) createWithCustomKey(customKey, url string) (*db.Record, error) {
-	alreadyExists, err := s.storage.Exists(customKey)
+func (s *UrlService) createWithCustomKey(ctx context.Context, customKey, url string) (*db.Record, error) {
+	alreadyExists, err := s.storage.Exists(ctx, customKey)
 	if err != nil {
 		log.Errorf("Error check the db for key '%v', URL '%v'. Error: %v", customKey, url, err)
 		return nil, err
@@ -93,24 +94,24 @@ func (s *UrlService) createWithCustomKey(customKey, url string) (*db.Record, err
 		message := fmt.Sprintf("The custom key '%s' already exists", customKey)
 		return nil, errors.New(message)
 	}
-	return s.createRecord(customKey, url, s.expiration)
+	return s.createRecord(ctx, customKey, url, s.expiration)
 }
 
-func (s *UrlService) createWithRandKey(url string) (*db.Record, error) {
-	key, err := s.createKey()
+func (s *UrlService) createWithRandKey(ctx context.Context, url string) (*db.Record, error) {
+	key, err := s.createKey(ctx)
 	log.Debugf("Random key '%v' was generated for URL '%v'", key, url)
 	if err != nil {
 		return nil, err
 	}
-	return s.createRecord(key, url, s.expiration)
+	return s.createRecord(ctx, key, url, s.expiration)
 }
 
-func (s *UrlService) createKey() (string, error) {
+func (s *UrlService) createKey(ctx context.Context) (string, error) {
 	var key string
 	exists := true
 	for exists {
 		key = randKey(s.keyLen)
-		e, err := s.storage.Exists(key)
+		e, err := s.storage.Exists(ctx, key)
 		if err != nil {
 			return "", err
 		}
@@ -119,10 +120,10 @@ func (s *UrlService) createKey() (string, error) {
 	return key, nil
 }
 
-func (s *UrlService) createRecord(key, url string, expireIn int64) (*db.Record, error) {
+func (s *UrlService) createRecord(ctx context.Context, key, url string, expireIn int64) (*db.Record, error) {
 	log.Debugf("Creating record (key = %v, URL = %v)", key, url)
 	rec := &db.Record{Key: key, URL: url}
-	err := s.storage.SaveWithExpiration(rec, expireIn)
+	err := s.storage.SaveWithExpiration(ctx, rec, expireIn)
 	if err != nil {
 		log.Errorf("Could not save record %v. Error: %v", rec, err)
 		return nil, err
