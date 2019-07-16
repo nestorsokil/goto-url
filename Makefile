@@ -18,3 +18,10 @@ docker.build:
 
 docker.build.publish: docker.build
 	docker push nsokil/gotourl:latest
+
+docker.build.frontend:
+	docker build -t gotourl-frontend:1.0 -f ./frontend/Dockerfile ./frontend
+	docker tag gotourl-frontend:1.0 gotourl-frontend:latest
+
+docker.build.frontend.public: docker.build.frontend
+	docker push nsokil/gotourl-frontend:latest

@@ -1,11 +1,9 @@
-FROM golang:1.11.0-alpine3.8 as compile
+FROM golang:1.12.7-alpine3.10 as compile
 WORKDIR /go/src/github.com/nestorsokil/goto-url
 COPY . .
 RUN apk --update add ca-certificates \
     && apk add --no-cache git \
-    && go get -u github.com/golang/dep/... \
-    && dep ensure \
-    && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o goto-url-binary .
+    && GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o goto-url-binary .
 
 FROM scratch as runtime
 WORKDIR /root/
