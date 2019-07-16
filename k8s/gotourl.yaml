@@ -23,6 +23,12 @@ data:
   ENV_EXPIRATION_MILLIS: "7200000"
   ENV_STORAGE: "redis"
   ENV_REDIS_URL: "redis:6379"
+  ENV_TRACE_DB_ENABLED: "true"
+  JAEGER_SERVICE_NAME: "goto-url"
+  JAEGER_SAMPLER_TYPE: "const"
+  JAEGER_SAMPLER_PARAM: "1"
+  JAEGER_ENDPOINT: "http://jaeger-collector:14268/api/traces"
+  JAEGER_REPORTER_LOG_SPANS: "true"
 
 ---
 apiVersion: apps/v1

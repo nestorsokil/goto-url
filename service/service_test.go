@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"github.com/nestorsokil/goto-url/conf"
 	"github.com/nestorsokil/goto-url/db"
 	"testing"
@@ -10,27 +11,29 @@ var c = &conf.TestConfig{Data: map[string]interface{}{
 	conf.EnvStorage:          conf.InMemory,
 	conf.EnvKeyLen:           10,
 	conf.EnvExpirationMillis: 60000,
+	conf.EnvTraceDbEnabled:   "false",
 }}
 var ds, _ = db.CreateStorage(c)
 var subject = New(ds, c)
 
 func TestUrlService_CreateRecordWithGeneratedKey(t *testing.T) {
 	testUrl := "http://url.com"
-	record, err := subject.CreateRecord(testUrl, "")
+	ctx := context.Background()
+	record, err := subject.CreateRecord(ctx, testUrl, "")
 	if err != nil {
 		t.Errorf("Error creating record %v", err)
 	}
 	if record.URL != testUrl {
 		t.Errorf("Expected %v, Actual %v", testUrl, record.URL)
 	}
-	exists, err := ds.Exists(record.Key)
+	exists, err := ds.Exists(ctx, record.Key)
 	if err != nil {
 		t.Errorf("Error checking record existence %v", err)
 	}
 	if !exists {
 		t.Errorf("Record was not created in the data storage")
 	}
-	saved, err := ds.Find(record.Key)
+	saved, err := ds.Find(ctx, record.Key)
 	if err != nil {
 		t.Errorf("Error getting record %v", err)
 	}
@@ -45,7 +48,8 @@ func TestUrlService_CreateRecordWithGeneratedKey(t *testing.T) {
 func TestUrlService_CreateRecordWithCustomKey(t *testing.T) {
 	testUrl := "http://url.com"
 	customKey := "one-two-three"
-	record, err := subject.CreateRecord(testUrl, customKey)
+	ctx := context.Background()
+	record, err := subject.CreateRecord(ctx, testUrl, customKey)
 	if err != nil {
 		t.Errorf("Error creating record %v", err)
 	}
@@ -55,14 +59,14 @@ func TestUrlService_CreateRecordWithCustomKey(t *testing.T) {
 	if record.Key != customKey {
 		t.Errorf("Expected %v, Actual %v", customKey, record.Key)
 	}
-	exists, err := ds.Exists(record.Key)
+	exists, err := ds.Exists(ctx, record.Key)
 	if err != nil {
 		t.Errorf("Error checking record existence %v", err)
 	}
 	if !exists {
 		t.Errorf("Record was not created in the data storage")
 	}
-	saved, err := ds.Find(record.Key)
+	saved, err := ds.Find(ctx, record.Key)
 	if err != nil {
 		t.Errorf("Error getting record %v", err)
 	}
@@ -75,7 +79,7 @@ func TestUrlService_CreateRecordWithCustomKey(t *testing.T) {
 }
 
 func TestUrlService_CreateRecordWithInvalidUrl(t *testing.T) {
-	record, err := subject.CreateRecord("not-a-url", "")
+	record, err := subject.CreateRecord(context.Background(), "not-a-url", "")
 	if err != ErrNotUrl {
 		t.Errorf("Expected %v", ErrNotUrl)
 	}
@@ -85,12 +89,13 @@ func TestUrlService_CreateRecordWithInvalidUrl(t *testing.T) {
 }
 
 func TestUrlService_GetByKey(t *testing.T) {
+	ctx := context.Background()
 	key, url := "a-b-c", "test.com"
-	err := ds.SaveWithExpiration(&db.Record{Key: key, URL: url}, 10000)
+	err := ds.SaveWithExpiration(ctx, &db.Record{Key: key, URL: url}, 10000)
 	if err != nil {
 		t.Errorf("Error setting up test data %v", err)
 	}
-	record, err := subject.FindByKey(key)
+	record, err := subject.FindByKey(ctx, key)
 	if err != nil {
 		t.Errorf("Error getting record %v", err)
 	}
@@ -104,7 +109,7 @@ func TestUrlService_GetByKey(t *testing.T) {
 
 func TestGetNonExisting(t *testing.T) {
 	key := "does_not_exist"
-	record, err := subject.FindByKey(key)
+	record, err := subject.FindByKey(context.Background(), key)
 	if err != ErrNotFound {
 		t.Errorf("Excepted %v", ErrNotFound)
 	}

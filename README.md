@@ -17,7 +17,7 @@ See Makefile for deploy options
  - [x] deploy Prometheus with Grafana to monitor metrics
  - [ ] add Envoy ingress or Istio
  - [x] deploy Nginx to serve frontend app
- - [ ] deploy Jaeger (no reason, just for fun)
+ - [x] deploy Jaeger (all-in-one with direct node-to-collector http because I'm lazy)
  - [ ] integrate a CNI solution e.g. Calico/Weave/Cilium
  
 
