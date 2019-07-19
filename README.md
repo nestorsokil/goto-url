@@ -18,7 +18,7 @@ See Makefile for deploy options
  - [x] deploy Nginx to serve frontend app
  - [x] deploy Jaeger (all-in-one with direct node-to-collector http because I'm lazy)
  - [ ] integrate a CNI solution e.g. Calico/Weave
- - [ ] convert manifests to Helm charts 
+ - [x] convert manifests to Helm charts
  
 
 ##### Secondary
