@@ -25,3 +25,7 @@ docker.build.frontend:
 
 docker.build.frontend.public: docker.build.frontend
 	docker push nsokil/gotourl-frontend:latest
+
+helm.umbrella.install:
+	helm dependency update ./helm/umbrella/
+	helm install -n $(name) ./helm/umbrella/
