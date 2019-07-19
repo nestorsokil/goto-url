@@ -1,0 +1,5 @@
+dependencies:
+  - name: stable/redis
+    version: 8.0.18
+    repository: https://kubernetes-charts.storage.googleapis.com/
+
