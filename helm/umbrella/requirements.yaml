@@ -1,0 +1,10 @@
+dependencies:
+  - name: frontend
+    version: 1.0.0
+    repository: file://../frontend
+  - name: gotourl
+    version: 1.0.0
+    repository: file://../gotourl
+  - name: ingress
+    version: 1.0.0
+    repository: file://../ingress

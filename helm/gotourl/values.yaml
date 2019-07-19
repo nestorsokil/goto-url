@@ -18,9 +18,9 @@ service:
   port: 80
 
 env:
-  port: 80
-  keylength: 6
-  expirationMillis: 7200000
+  port: ":80"
+  keylength: "6"
+  expirationMillis: "7200000"
   storage: "redis"
   redisUrl: "redis:6379"
   traceDbEnabled: "true"
@@ -29,7 +29,7 @@ env:
     sampler: "const"
     samplerParam: "1"
     endpoint:
-    reporterLogSpans: "true"
+    reporterLogSpans: "false"
 
 resources: {}
 nodeSelector: {}
@@ -39,10 +39,11 @@ affinity: {}
 redis:
   redisPort: 6379
   usePassword: true
-  password: "12345678" # TODO export from secret
+  password: "12345678" # TODO export from secret (use Helm Secrets?)
   master:
     persistence:
       enabled: true
-  persistence:
-    existingClaim:
+  cluster:
+    enabled: false
+
 
