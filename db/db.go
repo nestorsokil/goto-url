@@ -42,7 +42,7 @@ func CreateStorage(c conf.Config) (DataStorage, error) {
 	}
 
 	if c.GetString(conf.EnvTraceDbEnabled) == "true" {
-		return &TraceDb{actual: dataStorage}, nil
+		return &traceDb{actual: dataStorage}, nil
 	}
 	return dataStorage, nil
 }
