@@ -43,8 +43,8 @@ func main() {
 
 	router.Handle("/metrics", promhttp.Handler())
 
-	router.Handle("/{key}", util.HttpSpan("http.key.redirect", rest.Redirect(urlService))).Methods("GET")
-	router.Handle("/url/short", util.HttpSpan("http.key.shorten", rest.Shorten(urlService))).Methods("GET")
+	router.Handle("/{key}", withMiddleware("http.key.redirect", rest.Redirect(urlService))).Methods("GET")
+	router.Handle("/url/short", withMiddleware("http.key.shorten", rest.Shorten(urlService))).Methods("GET")
 
 	port := c.GetString(conf.EnvPort)
 	log.Infof("Starting server on %v.", port)
@@ -61,4 +61,8 @@ func createTracer() (opentracing.Tracer, io.Closer) {
 		log.Fatalf("ERROR: cannot init Jaeger: %v\n", err)
 	}
 	return tracer, closer
+}
+
+func withMiddleware(id string, handler http.Handler) http.Handler {
+	return util.HttpProm(id, util.HttpSpan(id, handler))
 }

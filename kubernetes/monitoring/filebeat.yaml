@@ -5,7 +5,7 @@ metadata:
   name: filebeat-config
   namespace: default
   labels:
-    k8s-app: filebeat
+    app: filebeat
 data:
   filebeat.yml: |-
     filebeat.inputs:
@@ -143,7 +143,7 @@ kind: ClusterRole
 metadata:
   name: filebeat
   labels:
-    k8s-app: filebeat
+    app: filebeat
 rules:
   - apiGroups: [""]
     resources:
@@ -162,6 +162,6 @@ metadata:
   name: filebeat
   namespace: default
   labels:
-    k8s-app: filebeat
+    app: filebeat
 
 ---

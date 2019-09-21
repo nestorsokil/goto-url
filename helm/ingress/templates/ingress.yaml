@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: gotourl-ingress
@@ -11,13 +11,13 @@ spec:
         paths:
           - path: "/index.html"
             backend:
-              serviceName: {{ .Release.Name }}-frontend-svc
-              servicePort: 80 # todo un-hardcode
+              serviceName: frontend
+              servicePort: 80
           - path: "/js"
             backend:
-              serviceName: {{ .Release.Name }}-frontend-svc
+              serviceName: frontend
               servicePort: 80
           - path: "/"
             backend:
-              serviceName: {{ .Release.Name }}-gotourl-svc
+              serviceName: gotourl
               servicePort: 80

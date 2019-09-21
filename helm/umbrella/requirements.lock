@@ -9,4 +9,4 @@ dependencies:
   repository: file://../ingress
   version: 1.0.0
 digest: sha256:50c31c3ece4e4125e82676fb8cd6297ec351e419cf147f32adba971a9ff7e65f
-generated: "2019-07-19T23:22:45.271657985+03:00"
+generated: "2019-09-20T17:35:51.236032929+03:00"

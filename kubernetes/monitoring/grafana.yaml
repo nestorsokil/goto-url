@@ -6,13 +6,13 @@ metadata:
 spec:
   selector:
     matchLabels:
-      k8s-app: grafana
+      app: grafana
   replicas: 1
   template:
     metadata:
       labels:
         task: monitoring
-        k8s-app: grafana
+        app: grafana
     spec:
       containers:
         - name: grafana
@@ -66,4 +66,4 @@ spec:
     - port: 3000
       targetPort: 3000
   selector:
-    k8s-app: grafana
+    app: grafana

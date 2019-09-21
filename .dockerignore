@@ -1,5 +1,7 @@
 frontend
 vendor
 kubernetes
+helm
+deploy
 .idea
 README.md

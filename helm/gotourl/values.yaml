@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: nsokil/gotourl
-  tag: latest
+  tag: 367d717
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -28,7 +28,7 @@ env:
     serviceName: "goto-url"
     sampler: "const"
     samplerParam: "1"
-    endpoint:
+    endpoint: "http://jaeger-collector:14268/api/traces"
     reporterLogSpans: "false"
 
 resources: {}

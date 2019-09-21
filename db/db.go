@@ -7,6 +7,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/nestorsokil/goto-url/conf"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type DataStorage interface {
@@ -51,6 +52,8 @@ func newMockDS() DataStorage {
 	return &mockDataSource{records: make(map[string]*Record)}
 }
 
+const attempts = 5
+
 func newRedis(c conf.Config) (DataStorage, error) {
 	address, password := c.GetString(conf.EnvRedisUrl), c.GetString(conf.EnvRedisPass)
 	log.Infof("Trying to connect to Redis on address '%v'", address)
@@ -58,10 +61,14 @@ func newRedis(c conf.Config) (DataStorage, error) {
 		Addr:     address,
 		Password: password,
 	})
-	pong, err := cli.Ping().Result()
-	if err != nil {
-		log.Errorf("Could not create Redis client (response = %v, error = %v)", pong, err)
-		return nil, errors.New("connection error")
+	for i := 1; i <= attempts; i++ {
+		pong, err := cli.Ping().Result()
+		if err == nil {
+			return &redisdb{cli}, nil
+		}
+		log.Errorf("Could not create Redis client (attempt = %v, response = %v, error = %v)", i, pong, err)
+		time.Sleep(5 * time.Second) // todo exponential
 	}
-	return &redisdb{cli}, nil
+	log.Errorf("Could not establish Redis connection in %v attempts", attempts)
+	return nil, errors.New("connection error")
 }
