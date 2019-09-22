@@ -1,4 +1,4 @@
 .PHONY: dashboard
 
 dashboard:
-	../venv/bin/generate-dashboard -o grafana/dashboard.json grafana/grafana.dashboard.py
+	../venv/bin/generate-dashboard -o dashboard.json grafana.dashboard.py

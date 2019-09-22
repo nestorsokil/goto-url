@@ -1,7 +1,26 @@
 {
   "__inputs": [],
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "iconColor": "#cca300",
+        "name": "GoToURL deployment",
+        "tags": [
+          "deployment"
+        ]
+      },
+      {
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "iconColor": "#bf1b00",
+        "name": "GoToURL rollback",
+        "tags": [
+          "rollback"
+        ]
+      }
+    ]
   },
   "editable": true,
   "gnetId": null,
@@ -10,6 +29,185 @@
   "links": [],
   "refresh": "10s",
   "rows": [
+    {
+      "collapse": false,
+      "editable": true,
+      "height": "250px",
+      "panels": [
+        {
+          "alert": {
+            "conditions": [
+              {
+                "evaluator": {
+                  "params": [
+                    0.1
+                  ],
+                  "type": "gt"
+                },
+                "operator": {
+                  "type": "and"
+                },
+                "query": {
+                  "model": {
+                    "datasource": "",
+                    "expr": "",
+                    "format": "time_series",
+                    "instant": false,
+                    "interval": "",
+                    "intervalFactor": 2,
+                    "legendFormat": "0.99 quantile",
+                    "metric": "",
+                    "refId": "C",
+                    "step": 10,
+                    "target": ""
+                  },
+                  "params": [
+                    "C",
+                    "5m",
+                    "now"
+                  ]
+                },
+                "reducer": {
+                  "params": [],
+                  "type": "avg"
+                },
+                "type": "query"
+              }
+            ],
+            "executionErrorState": "alerting",
+            "frequency": "60s",
+            "handler": 1,
+            "message": "p99 is above 100ms for 5 minutes",
+            "name": "High p99 latency",
+            "noDataState": "ok",
+            "notifications": []
+          },
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "k8s-prometheus",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "id": 1,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "seriesOverrides": [],
+          "span": 12,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "",
+              "expr": "histogram_quantile(0.5, sum(rate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le)) >= 0",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "0.5 quantile",
+              "metric": "",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": "",
+              "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le)) >= 0",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "0.95 quantile",
+              "metric": "",
+              "refId": "B",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": "",
+              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le)) >= 0",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "0.99 quantile",
+              "metric": "",
+              "refId": "C",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "GoToURL latency",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "show": true
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "s",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": 0,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": 0,
+              "show": true
+            }
+          ]
+        }
+      ],
+      "repeat": null,
+      "showTitle": false,
+      "title": "New row"
+    },
     {
       "collapse": false,
       "editable": true,
@@ -76,7 +274,7 @@
             "threshold2": null,
             "threshold2Color": "rgba(234, 112, 112, 0.22)"
           },
-          "id": 1,
+          "id": 2,
           "isNew": true,
           "legend": {
             "alignAsTable": false,
@@ -105,7 +303,7 @@
           "renderer": "flot",
           "repeat": null,
           "seriesOverrides": [],
-          "span": 6,
+          "span": 12,
           "stack": false,
           "steppedLine": false,
           "targets": [
@@ -177,7 +375,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "GoToURL QPS",
+          "title": "GoToURL QPS by HTTP code",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -209,14 +407,24 @@
               "show": true
             }
           ]
-        },
+        }
+      ],
+      "repeat": null,
+      "showTitle": false,
+      "title": "New row"
+    },
+    {
+      "collapse": false,
+      "editable": true,
+      "height": "250px",
+      "panels": [
         {
           "alert": {
             "conditions": [
               {
                 "evaluator": {
                   "params": [
-                    0.1
+                    1000
                   ],
                   "type": "gt"
                 },
@@ -231,21 +439,21 @@
                     "instant": false,
                     "interval": "",
                     "intervalFactor": 2,
-                    "legendFormat": "0.99 quantile",
+                    "legendFormat": "requests",
                     "metric": "",
-                    "refId": "C",
+                    "refId": "A",
                     "step": 10,
                     "target": ""
                   },
                   "params": [
-                    "C",
+                    "A",
                     "5m",
                     "now"
                   ]
                 },
                 "reducer": {
                   "params": [],
-                  "type": "avg"
+                  "type": "count"
                 },
                 "type": "query"
               }
@@ -253,8 +461,8 @@
             "executionErrorState": "alerting",
             "frequency": "60s",
             "handler": 1,
-            "message": "p99 is above 100ms for 5 minutes",
-            "name": "High p99 latency",
+            "message": "More than 1000 QPS for 5 minutes",
+            "name": "High Request Rate",
             "noDataState": "ok",
             "notifications": []
           },
@@ -271,7 +479,7 @@
             "threshold2": null,
             "threshold2Color": "rgba(234, 112, 112, 0.22)"
           },
-          "id": 2,
+          "id": 3,
           "isNew": true,
           "legend": {
             "alignAsTable": false,
@@ -300,53 +508,27 @@
           "renderer": "flot",
           "repeat": null,
           "seriesOverrides": [],
-          "span": 6,
+          "span": 12,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
               "datasource": "",
-              "expr": "histogram_quantile(0.5, sum(rate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le)) >= 0",
+              "expr": "sum(rate(http_request_duration_seconds_count{job=\"gotourl-app\"}[1m]))",
               "format": "time_series",
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "0.5 quantile",
+              "legendFormat": "HTTP requests",
               "metric": "",
               "refId": "A",
-              "step": 10,
-              "target": ""
-            },
-            {
-              "datasource": "",
-              "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le)) >= 0",
-              "format": "time_series",
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "0.95 quantile",
-              "metric": "",
-              "refId": "B",
-              "step": 10,
-              "target": ""
-            },
-            {
-              "datasource": "",
-              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le)) >= 0",
-              "format": "time_series",
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "0.99 quantile",
-              "metric": "",
-              "refId": "C",
               "step": 10,
               "target": ""
             }
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "GoToURL latency",
+          "title": "GoToURL QPS Total",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -361,7 +543,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "s",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
