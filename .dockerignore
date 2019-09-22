@@ -1,7 +1,9 @@
 frontend
 vendor
-kubernetes
-helm
-deploy
+ops/kubernetes
+ops/helm
+ops
 .idea
 README.md
+*.log
+log

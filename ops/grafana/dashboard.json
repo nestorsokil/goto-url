@@ -31,26 +31,26 @@
                 "query": {
                   "model": {
                     "datasource": "",
-                    "expr": "sum(irate(promhttp_metric_handler_requests_total{job=\"gotourl-app\",status=~\"5..\"}[1m]))",
+                    "expr": "",
                     "format": "time_series",
                     "instant": false,
                     "interval": "",
                     "intervalFactor": 2,
                     "legendFormat": "5xx",
                     "metric": "",
-                    "refId": "A",
+                    "refId": "E",
                     "step": 10,
                     "target": ""
                   },
                   "params": [
-                    "A",
+                    "E",
                     "5m",
                     "now"
                   ]
                 },
                 "reducer": {
                   "params": [],
-                  "type": "sum"
+                  "type": "count"
                 },
                 "type": "query"
               }
@@ -58,14 +58,14 @@
             "executionErrorState": "alerting",
             "frequency": "60s",
             "handler": 1,
-            "message": "More than 5 QPS of 500s on Nginx for 5 minutes",
+            "message": "More than 5 QPS of HTTP 5xx for 5 minutes",
             "name": "Too many 500s",
-            "noDataState": "no_data",
+            "noDataState": "ok",
             "notifications": []
           },
           "aliasColors": {},
           "bars": false,
-          "datasource": "k8s_prometheus",
+          "datasource": "k8s-prometheus",
           "description": null,
           "editable": true,
           "error": false,
@@ -111,7 +111,7 @@
           "targets": [
             {
               "datasource": "",
-              "expr": "sum(irate(promhttp_metric_handler_requests_total{job=\"gotourl-app\",code=~\"1..\"}[1m]))",
+              "expr": "sum(rate(http_request_duration_seconds_count{job=\"gotourl-app\",code=~\"1..\"}[1m]))",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -124,7 +124,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(promhttp_metric_handler_requests_total{job=\"gotourl-app\",code=~\"2..\"}[1m]))",
+              "expr": "sum(rate(http_request_duration_seconds_count{job=\"gotourl-app\",code=~\"2..\"}[1m]))",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -137,7 +137,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(promhttp_metric_handler_requests_total{job=\"gotourl-app\",code=~\"3..\"}[1m]))",
+              "expr": "sum(rate(http_request_duration_seconds_count{job=\"gotourl-app\",code=~\"3..\"}[1m]))",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -150,7 +150,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(promhttp_metric_handler_requests_total{job=\"gotourl-app\",code=~\"4..\"}[1m]))",
+              "expr": "sum(rate(http_request_duration_seconds_count{job=\"gotourl-app\",code=~\"4..\"}[1m]))",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -163,7 +163,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(promhttp_metric_handler_requests_total{job=\"gotourl-app\",code=~\"5..\"}[1m]))",
+              "expr": "sum(rate(http_request_duration_seconds_count{job=\"gotourl-app\",code=~\"5..\"}[1m]))",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -211,6 +211,53 @@
           ]
         },
         {
+          "alert": {
+            "conditions": [
+              {
+                "evaluator": {
+                  "params": [
+                    0.1
+                  ],
+                  "type": "gt"
+                },
+                "operator": {
+                  "type": "and"
+                },
+                "query": {
+                  "model": {
+                    "datasource": "",
+                    "expr": "",
+                    "format": "time_series",
+                    "instant": false,
+                    "interval": "",
+                    "intervalFactor": 2,
+                    "legendFormat": "0.99 quantile",
+                    "metric": "",
+                    "refId": "C",
+                    "step": 10,
+                    "target": ""
+                  },
+                  "params": [
+                    "C",
+                    "5m",
+                    "now"
+                  ]
+                },
+                "reducer": {
+                  "params": [],
+                  "type": "avg"
+                },
+                "type": "query"
+              }
+            ],
+            "executionErrorState": "alerting",
+            "frequency": "60s",
+            "handler": 1,
+            "message": "p99 is above 100ms for 5 minutes",
+            "name": "High p99 latency",
+            "noDataState": "ok",
+            "notifications": []
+          },
           "aliasColors": {},
           "bars": false,
           "datasource": "k8s-prometheus",
@@ -259,7 +306,7 @@
           "targets": [
             {
               "datasource": "",
-              "expr": "histogram_quantile(0.5, sum(irate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.5, sum(rate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le)) >= 0",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -272,14 +319,27 @@
             },
             {
               "datasource": "",
-              "expr": "histogram_quantile(0.99, sum(irate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le)) >= 0",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "0.95 quantile",
+              "metric": "",
+              "refId": "B",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": "",
+              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job=\"gotourl-app\"}[1m])) by (le)) >= 0",
               "format": "time_series",
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
               "legendFormat": "0.99 quantile",
               "metric": "",
-              "refId": "B",
+              "refId": "C",
               "step": 10,
               "target": ""
             }

@@ -3,7 +3,7 @@
 Simple web application to shorten URLs.
 The application can store its data in Redis and in memory (for testing purposes only).
 
-The purpose is learning to deploy a near-prod-grade k8s cluster along with modern tools.
+The purpose is learning to deploy a k8s cluster along with modern tools.
 
 See Makefile for deploy options
 

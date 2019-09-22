@@ -1,15 +1,3 @@
-k.apply.all:
-	kubectl apply -f ./k8s/elk.yaml
-	kubectl apply -f ./k8s/filebeat.yaml
-	kubectl apply -f ./k8s/ingress.yaml
-	kubectl apply -f ./k8s/redis.yaml
-	kubectl apply -f ./k8s/frontend.yaml
-	kubectl apply -f ./k8s/gotourl.yaml
-
-minikube.start:
-	minikube start --cpus 3 --memory 8192
-	minikube addons enable ingress
-
 docker.build:
 	docker build -t nsokil/gotourl:1.0 .
 	docker tag nsokil/gotourl:1.0 nsokil/gotourl:latest
@@ -23,7 +11,3 @@ docker.build.frontend:
 
 docker.build.frontend.publish: docker.build.frontend
 	docker push nsokil/gotourl-frontend:latest
-
-helm.umbrella.install:
-	helm dependency update ./helm/umbrella/
-	helm install -n $(name) ./helm/umbrella/
