@@ -53,7 +53,7 @@ curl -XPOST "$GRAFANA_URL"/api/annotations \
   --data @- <<EOF
   {
     "text": "Rollback deployment 'gotourl:$ROLLED_VERSION'\n\n
-      <a href=\"https://github.com/org/nestorsokil/goto-url/commit/$ROLLED_VERSION\">GitHub ($ROLLED_VERSION)</a>",
+      <a href=\"https://github.com/nestorsokil/goto-url/commit/$ROLLED_VERSION\">GitHub ($ROLLED_VERSION)</a>",
     "tags": [
       "rollback"
     ]

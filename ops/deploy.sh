@@ -54,7 +54,7 @@ curl -XPOST "$GRAFANA_URL"/api/annotations \
   --data @- <<EOF
   {
     "text": "Deployment 'gotourl:$VERSION'\n\n
-      <a href=\"https://github.com/org/nestorsokil/goto-url/commit/$VERSION\">GitHub ($VERSION)</a>",
+      <a href=\"https://github.com/nestorsokil/goto-url/commit/$VERSION\">GitHub ($VERSION)</a>",
     "tags": [
       "deployment"
     ]
