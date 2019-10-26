@@ -3,7 +3,7 @@
 # rollback.sh --release=apps --revision=0 --grafana-url=192.168.99.100:30540 --grafana-auth=eyJrIjoiQWxaRXJJN1NUMHFzUzZaMHlNQUtwck0xVWdmN3hFblEiLCJuIjoiRGVwbG95bWVudCBBbm5vdGF0aW9ucyIsImlkIjoxfQ==
 
 function print_usage() {
-  echo "usage: $0 [-gar] [-f infile] [-o outfile]"
+  echo "usage: $0 [-gar]"
   echo "  -g   --grafana-url     Grafana URL"
   echo "  -a   --grafana-auth    Grafana auth token"
   echo "  -r   --release         Helm release"
