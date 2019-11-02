@@ -7,6 +7,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/nestorsokil/goto-url/conf"
 	log "github.com/sirupsen/logrus"
+	"strings"
 	"time"
 )
 
@@ -42,7 +43,7 @@ func CreateStorage(c conf.Config) (DataStorage, error) {
 		return nil, errors.New(e)
 	}
 
-	if c.GetString(conf.EnvTraceDbEnabled) == "true" {
+	if strings.ToLower(c.GetString(conf.EnvTraceDbEnabled)) == "true" {
 		return &traceDb{actual: dataStorage}, nil
 	}
 	return dataStorage, nil

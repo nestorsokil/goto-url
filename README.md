@@ -19,6 +19,8 @@ See Makefile for deploy options
  - [x] deploy Jaeger (all-in-one with direct node-to-collector http because I'm lazy)
  - [ ] integrate a CNI solution e.g. Calico/Weave
  - [x] convert manifests to Helm charts
+ - [x] simple deploy scripts
+ - [x] Grafana RED board 
  
 
 ##### Secondary

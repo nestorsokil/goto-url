@@ -40,12 +40,10 @@ if [ -z "$GRAFANA_URL" ] || [ -z "$GRAFANA_AUTH" ] || [ -z "$RELEASE" ]; then
   exit 1
 fi
 
-cd ../
 VERSION="$(git rev-parse --short=7 HEAD)"
 
-docker build -t nsokil/gotourl:"$VERSION" .
-docker push nsokil/gotourl:"$VERSION"
-
+cd ../backend
+make docker.build.publish version="$VERSION"
 helm upgrade "$RELEASE" ./ops/helm/gotourl --set image.tag="$VERSION"
 
 curl -XPOST "$GRAFANA_URL"/api/annotations \

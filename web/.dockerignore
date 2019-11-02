@@ -1,0 +1,5 @@
+vendor
+.idea
+README.md
+*.log
+log

@@ -1,4 +1,4 @@
 FROM nginx:1.15-alpine
 WORKDIR /usr/share/nginx/html
-COPY web .
+COPY app .
 EXPOSE 80/tcp

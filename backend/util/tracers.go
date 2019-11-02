@@ -2,7 +2,7 @@ package util
 
 import (
 	"github.com/opentracing/opentracing-go"
-	prommiddleware "github.com/slok/go-prometheus-middleware"
+	prometheus "github.com/slok/go-prometheus-middleware"
 	"net/http"
 )
 
@@ -16,7 +16,7 @@ func HttpSpan(spanName string, next http.Handler) http.Handler {
 	})
 }
 
-var promRecordMetrics = prommiddleware.NewDefault()
+var promRecordMetrics = prometheus.NewDefault()
 
 func HttpProm(handlerName string, next http.Handler) http.Handler {
 	return promRecordMetrics.Handler(handlerName, next)

@@ -1,9 +1,0 @@
-frontend
-vendor
-ops/kubernetes
-ops/helm
-ops
-.idea
-README.md
-*.log
-log
