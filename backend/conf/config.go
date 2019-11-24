@@ -6,18 +6,22 @@ import (
 )
 
 const (
-	EnvPort             = "ENV_PORT"
-	EnvKeyLen           = "ENV_KEY_LEN"
-	EnvExpirationMillis = "ENV_EXPIRATION_MILLIS"
-	EnvStorage          = "ENV_STORAGE"
-	EnvTraceDbEnabled   = "ENV_TRACE_DB_ENABLED"
-	EnvRedisUrl         = "ENV_REDIS_URL"
-	EnvRedisPass        = "ENV_REDIS_PASS"
+	EnvPort              = "ENV_PORT"
+	EnvKeyLen            = "ENV_KEY_LEN"
+	EnvExpirationMillis  = "ENV_EXPIRATION_MILLIS"
+	EnvStorage           = "ENV_STORAGE"
+	EnvTraceDbEnabled    = "ENV_TRACE_DB_ENABLED"
+	EnvRedisUrl          = "ENV_REDIS_URL"
+	EnvRedisPass         = "ENV_REDIS_PASS"
+	EnvCassandraUrl      = "ENV_CASSANDRA_URL"
+	EnvCassandraPass     = "ENV_CASSANDRA_PASS"
+	EnvCassandraKeyspace = "ENV_CASSANDRA_KEYSPACE"
 )
 
 const (
-	InMemory = "inMemory"
-	Redis    = "redis"
+	InMemory  = "inMemory"
+	Redis     = "redis"
+	Cassandra = "cassandra"
 )
 
 type Config interface {

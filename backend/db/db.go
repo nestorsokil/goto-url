@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
+	"github.com/gocql/gocql"
 	"github.com/nestorsokil/goto-url/conf"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -35,14 +36,15 @@ func CreateStorage(c conf.Config) (DataStorage, error) {
 		dataStorage = newMockDS()
 	case conf.Redis:
 		dataStorage, err = newRedis(c)
-		if err != nil {
-			return nil, err
-		}
+	case conf.Cassandra:
+		dataStorage, err = newCassandra(c)
 	default:
 		e := fmt.Sprintf("Unrecognized db option: %s", storage)
 		return nil, errors.New(e)
 	}
-
+	if err != nil {
+		return nil, err
+	}
 	if strings.ToLower(c.GetString(conf.EnvTraceDbEnabled)) == "true" {
 		return &traceDb{actual: dataStorage}, nil
 	}
@@ -72,4 +74,17 @@ func newRedis(c conf.Config) (DataStorage, error) {
 	}
 	log.Errorf("Could not establish Redis connection in %v attempts", attempts)
 	return nil, errors.New("connection error")
+}
+
+func newCassandra(c conf.Config) (DataStorage, error) {
+	urls := strings.Split(c.GetString(conf.EnvCassandraUrl), ",")
+	cluster := gocql.NewCluster(urls...)
+	cluster.Keyspace = c.GetString(conf.EnvCassandraKeyspace)
+	cluster.Consistency = gocql.LocalQuorum
+	session, err := cluster.CreateSession()
+	if err != nil {
+		log.Error("Could not create C* session: %v", err.Error())
+		return nil, err
+	}
+	return &cassandraDb{session: session}, nil
 }

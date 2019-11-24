@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/go-redis/redis v6.14.2+incompatible
+	github.com/gocql/gocql v0.0.0-20191106222750-ae2f7fc85f32 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/jaegertracing/jaeger-client-go v2.16.0+incompatible
 	github.com/opentracing/opentracing-go v1.1.0
